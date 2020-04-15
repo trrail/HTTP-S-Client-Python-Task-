@@ -14,11 +14,9 @@ parser.add_argument('-c', '--cookie', type=str, help='add cookie')
 args = parser.parse_args()
 
 
-def make_request(args):
+if __name__ == '__main__':
+    
     request = Request(args)
     request.make_request()
     request.do_request()
     request.print_answer()
-
-
-make_request(args)
