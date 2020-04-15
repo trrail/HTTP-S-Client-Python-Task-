@@ -1,6 +1,6 @@
 # python-tasks
  Use Keys:
- -d - post request
+ -d - post request \r\n
  -G - get request
  -f - send file by post request
  -v - get detailed response
