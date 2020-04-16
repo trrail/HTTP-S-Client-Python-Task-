@@ -3,6 +3,7 @@
  -d - post request
  -G - get request
  -f - send file by post request
+ -O - save answer in file
  -v - get detailed response
  -e - add reference
   
