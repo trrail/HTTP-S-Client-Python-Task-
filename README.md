@@ -10,7 +10,7 @@
  -e - add reference
   
  How it works:
- In Terminal: python http.py url
+ In Terminal: python make_request.py url + args
 
 
 -d + "string"
