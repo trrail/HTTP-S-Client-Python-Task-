@@ -12,9 +12,15 @@
  How it works:
  In Terminal: python make_request.py url + args
 
-
+Args use:
 -d + "string"
 
 -f + "file name"
 
 -e + "reference"
+
+-O + "file name"
+
+-A + "User-Agent"
+
+-c + "cookie"
