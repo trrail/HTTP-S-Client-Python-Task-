@@ -1,8 +1,7 @@
-                                                   HTTP(S) - Client 
 
+# HTTP(S) - Client 
 
-#Hello
- Use Keys:
+# Use Keys:
  -d - post request
  -G - get request
  -f - send file by post request
@@ -12,10 +11,10 @@
  -v - get detailed response
  -e - add reference
   
- How it works:
+# How it works:
  In Terminal: python make_request.py url + args
 
-Args use:
+# Args use:
 -d + "string"
 
 -f + "file name"
