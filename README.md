@@ -12,7 +12,7 @@
 * You should print in terminal: python make_request.py url args
 -----------------------------------------------------------------------------------------------------------------------------------
 
-| Argument |                 Action              |                               Example                            | 
+| Argument |                 Action              |                               Using Examples                     | 
 |----------|-------------------------------------|------------------------------------------------------------------|
 |    -d    |       Send data by POST request     | -d "Hello, World!"                                               |
 |    -f    | Send data from file by POST request | -f "test.txt"                                                    |
@@ -21,3 +21,4 @@
 |    -A    |       Add User-Agent in request     | -A "Mozilla/5.0"                                                 |
 |    -c    |         Add cookie in request       | -c "income=1"                                                    |
 |    -H    |         Add headers(Split by $)     | -H "Accept: */*$Authorization: Basic YWxhZGRpbjpvcGVuc2VzYW1l"   |                                 
+|    -v    |        Print request + answer       | -v                                                               |
