@@ -20,5 +20,5 @@
 |    -O    |         Write answer in file        | -O "test.txt"                                                    |
 |    -A    |       Add User-Agent in request     | -A "Mozilla/5.0"                                                 |
 |    -c    |         Add cookie in request       | -c "income=1"                                                    |
-|    -H    |         Add headers(Split by $)     | -H "Accept: */*$Authorization: Basic YWxhZGRpbjpvcGVuc2VzYW1l"   |                                 
+|    -H    |         Add headers(Split by $)     | -H "Accept: **/**$Authorization: Basic YWxhZGRpbjpvcGVuc2VzYW1l"   |                                 
 |    -v    |        Print request + answer       | -v                                                               |
