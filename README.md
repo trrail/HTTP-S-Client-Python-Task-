@@ -2,8 +2,8 @@
 # HTTP(S) - Client 
 
 ## Program can:
-* Send post requests and get answer
-* Send get requests and get answer
+* Send POST requests and get answer
+* Send GET requests and get answer
 * Send data from file by post request
 * Save answer in file
 * You can add: cookie, user-agent, headers and reference 
