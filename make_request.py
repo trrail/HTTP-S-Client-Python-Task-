@@ -4,8 +4,8 @@ import re
 
 
 parser = argparse.ArgumentParser(description='HTTP(S) - Client')
-parser.add_argument('-d', '--post', type=str, help='post request')
-parser.add_argument('-G', '--get', action='store_true', help='get request')
+parser.add_argument('-d', '--data', type=str, help='data for request')
+parser.add_argument('-r', '--request', type=str, help='choose request method')
 parser.add_argument('url', type=str, help='Contains URL')
 parser.add_argument('-e', '--reference', type=str, help='add previous URL')
 parser.add_argument('-v', '--verbose', action='store_true', help='detailed response')
@@ -27,13 +27,14 @@ def make_request():
             headers[head[0][:-1]] = value[0][2:]
     request = Request(args.url,
                       args.reference,
-                      args.post,
+                      args.data,
                       args.verbose,
                       args.file,
                       args.cookie,
                       args.agent,
                       args.output,
-                      headers)
+                      headers,
+                      args.request)
     request.do_request()
 
 

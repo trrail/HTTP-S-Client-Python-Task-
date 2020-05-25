@@ -8,16 +8,17 @@ from yarl import URL
 class Request():
     def __init__(self, url=None,
                  reference=None,
-                 post=None,
+                 data=None,
                  verbose=None,
                  file=None,
                  cookie=None,
                  agent=None,
                  output=None,
-                 headers={}):
+                 headers={},
+                 request=None):
         self._url = URL(url)
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self._post = post
+        self._data = data
         self._reference = reference
         self._verbose = verbose
         self._file = file
@@ -25,7 +26,7 @@ class Request():
         self._agent = agent
         self._output = output
         self._headers = headers
-        self._request_type = "POST" if post or file else "GET"
+        self._request_type = request if request else "GET"
         if self._url.scheme == 'https':
             self.__sock = ssl.wrap_socket(self.__sock)
 
@@ -37,10 +38,10 @@ class Request():
         self.__sock.sendall(request)
         answer = ''
         while True:
-            data = self.__sock.recv(2056)
+            data = self.__sock.recv(1024)
             if not data:
                 break
-            answer += data.decode()
+            answer += data.decode("ISO-8859-1")
         self.__sock.close()
         self.print_answer(answer=answer, request=request)
 
@@ -67,8 +68,8 @@ class Request():
                 request += (head + ': ' + self._headers[head] + '\r\n').encode('utf-8')
         if self._agent:
             request += ('User-Agent: ' + self._agent + '\r\n').encode('utf-8')
-        if self._post:
-            data = self._post
+        if self._data:
+            data = self._data
             request += ('Content-Length: ' + str(len(data) + 5) + '\r\n\r\n' + 'body=' + data + '\r\n').encode('utf-8')
         if self._file:
             f = open(self._file, 'r')
