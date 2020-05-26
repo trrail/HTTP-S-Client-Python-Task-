@@ -15,7 +15,9 @@ class Request():
                  agent=None,
                  output=None,
                  headers=None,
-                 request=None):
+                 request=None,
+                 cookiefile=None,
+                 bodyignore=None):
         self._url = URL(url)
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._data = data
@@ -26,8 +28,10 @@ class Request():
         self._cookie = cookie
         self._agent = agent
         self._output = output
+        self._cookie_from_file = cookiefile
         self._input_headers = headers
         self._headers = {}
+        self._body_ignore = bodyignore
         self._request_type = request if request else "GET"
         if self._url.scheme == 'https':
             self.__sock = ssl.wrap_socket(self.__sock)
@@ -59,6 +63,10 @@ class Request():
             self._headers["Reference"] = self._reference
         if self._cookie:
             self._headers["Cookie"] = self._cookie
+        if self._cookie_from_file:
+            f = open(self._cookie_from_file, 'r')
+            self._headers['Cookie'] = f.read()
+            f.close()
         if self._agent:
             self._headers["User-Agent"] = self._agent
 
@@ -84,8 +92,8 @@ class Request():
 
     def make_request(self):
         request = f'{self._request_type} {self._url.path} {self._protocol}\r\n' \
-                        f'Host: {self._url.host}\r\n' \
-                        f'Connection: close\r\n'
+                    f'Host: {self._url.host}\r\n' \
+                    f'Connection: close\r\n'
         for header, value in self._headers.items():
             request = ''.join((request, header, ': ', value, '\r\n'))
         body = self.prepare_data()

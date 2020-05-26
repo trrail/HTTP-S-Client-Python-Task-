@@ -12,17 +12,16 @@ parser.add_argument('-e', '--reference', type=str, help='add previous URL')
 parser.add_argument('-v', '--verbose', action='store_true', help='detailed response')
 parser.add_argument('-f', '--file', type=str, help='send data from file')
 parser.add_argument('-c', '--cookie', type=str, help='add cookie')
+parser.add_argument('-C', '--cookiefile', type=str, help='send cookie from file')
 parser.add_argument('-A', '--agent', type=str, help='add your own User_Agent')
 parser.add_argument('-O', '--output', type=str, help='print answer in file')
 parser.add_argument('-H', '--headers', type=str, nargs="+", help='add headers in request', dest="my_headers")
+parser.add_argument('-I', '--bodyignore', action='store_true', help='ignore body of response')
 
 
 def make_request():
     args = parser.parse_args()
-    errors.check_for_exceptions(args.url,
-                      args.data,
-                      args.file,
-                      args.request)
+    errors.check_for_exceptions(args)
     request = Request(args.url,
                       args.reference,
                       args.data,
@@ -32,7 +31,9 @@ def make_request():
                       args.agent,
                       args.output,
                       args.my_headers,
-                      args.request)
+                      args.request,
+                      args.cookiefile,
+                      args.bodyignore)
     request.do_request()
 
 
