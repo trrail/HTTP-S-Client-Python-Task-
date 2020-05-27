@@ -2,6 +2,7 @@ import socket
 import ssl
 import argparse
 import re
+import response
 from yarl import URL
 
 
@@ -71,14 +72,8 @@ class Request():
             self._headers["User-Agent"] = self._agent
 
     def print_answer(self, answer, request):
-        if self._verbose:
-            print('> ' + request + '\r\n' + '< ' + answer)
-        elif self._output:
-            f = open(self._output, 'w')
-            f.write(str(answer.encode("ISO-8859-1")))
-            f.close()
-        else:
-            print(answer)
+        new_response = response.Response(answer, request, self._verbose, self._output, self._body_ignore)
+        new_response.handle_response()
 
     def prepare_data(self):
         data = ''
