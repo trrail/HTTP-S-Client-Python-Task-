@@ -17,8 +17,9 @@ class Request():
                  output=None,
                  headers=None,
                  request=None,
-                 cookiefile=None,
-                 bodyignore=None):
+                 cookie_file=None,
+                 body_ignore=None,
+                 head_ignore=None):
         self._url = URL(url)
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._data = data
@@ -29,10 +30,11 @@ class Request():
         self._cookie = cookie
         self._agent = agent
         self._output = output
-        self._cookie_from_file = cookiefile
+        self._cookie_from_file = cookie_file
         self._input_headers = headers
         self._headers = {}
-        self._body_ignore = bodyignore
+        self._body_ignore = body_ignore
+        self._head_ignore = head_ignore
         self._request_type = request if request else "GET"
         if self._url.scheme == 'https':
             self.__sock = ssl.wrap_socket(self.__sock)
@@ -72,7 +74,12 @@ class Request():
             self._headers["User-Agent"] = self._agent
 
     def print_answer(self, answer, request):
-        new_response = response.Response(answer, request, self._verbose, self._output, self._body_ignore)
+        new_response = response.Response(answer,
+                                         request,
+                                         self._verbose,
+                                         self._output,
+                                         self._body_ignore,
+                                         self._head_ignore)
         new_response.handle_response()
 
     def prepare_data(self):
@@ -92,5 +99,8 @@ class Request():
         for header, value in self._headers.items():
             request = ''.join((request, header, ': ', value, '\r\n'))
         body = self.prepare_data()
-        request = ''.join((request, '\r\n\r\n', body, '\r\n'))
+        if len(body) != 0:
+            request = ''.join((request, 'Content-Length: ', str(len(body)), '\r\n\r\n', body, '\r\n'))
+        else:
+            request = ''.join((request, '\r\n'))
         return request

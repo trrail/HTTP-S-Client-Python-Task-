@@ -16,8 +16,9 @@ parser.add_argument('-C', '--cookiefile', type=str, help='send cookie from file'
 parser.add_argument('-A', '--agent', type=str, help='add your own User_Agent')
 parser.add_argument('-O', '--output', type=str, help='print answer in file')
 parser.add_argument('-H', '--headers', type=str, nargs="+", help='add headers in request', dest="my_headers")
-parser.add_argument('-I', '--bodyignore', action='store_true', help='ignore body of response')
-'''Под вопросом)'''
+parser.add_argument('-0', '--bodyignore', action='store_true', help='ignore body of response')
+parser.add_argument('-1', '--headignore', action='store_true', help='ignore head of response')
+
 
 def make_request():
     args = parser.parse_args()
@@ -33,7 +34,8 @@ def make_request():
                       args.my_headers,
                       args.request,
                       args.cookiefile,
-                      args.bodyignore)
+                      args.bodyignore,
+                      args.headignore)
     request.do_request()
 
 

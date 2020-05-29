@@ -34,3 +34,5 @@ def check_for_exceptions(args):
             pass
         finally:
             f.close()
+    if args.verbose and (args.bodyignore or args.headignore):
+        raise UncorrectArguments()
