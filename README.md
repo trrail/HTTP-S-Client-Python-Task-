@@ -14,11 +14,16 @@
 
 | Argument |                 Action              |                               Using Examples                     | 
 |----------|-------------------------------------|------------------------------------------------------------------|
-|    -d    |       Send data by POST request     | -d "Hello, World!"                                               |
-|    -f    | Send data from file by POST request | -f "test.txt"                                                    |
+|    -d    |            Send data                | -d "Hello, World!"                                               |
+|    -f    |         Send data from file         | -f "test.txt"                                                    |
 |    -e    |       Add reference in request      | -e "https://github.com/trrail/python-tasks/edit/master/README.md"|
 |    -O    |         Write answer in file        | -O "test.txt"                                                    |
 |    -A    |       Add User-Agent in request     | -A "Mozilla/5.0"                                                 |
 |    -c    |         Add cookie in request       | -c "income=1"                                                    |
-|    -H    |         Add headers(Split by $)     | -H "Accept: */* $Authorization: Basic YWxhZGRpbjpvcGVuc2VzYW1l"   |                                 
+|    -H    |         Add headers(Split by $)     | -H "Accept: */* Authorization: YWxhZGRpbjpvcGVuc2VzYW1l"         |                            
 |    -v    |        Print request + answer       | -v                                                               |
+|    -C    |         Add cookie from file        | -c "cookie.txt"                                                  |
+|    -r    |         Choose request method       | -r "POST"        ot -r "CONNECT"                                 |
+|    -0    |         Ignore body of response     | -0                                                               |
+|    -1    |         Ignore head of response     | -1                                                               |
+
