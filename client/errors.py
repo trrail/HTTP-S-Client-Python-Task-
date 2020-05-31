@@ -21,7 +21,7 @@ def check_for_exceptions(args):
     if args.file:
         f = open(args.file, 'r')
         try:
-            data = f.read()
+            f.read()
         except UnreadableFile():
             pass
         finally:
@@ -29,7 +29,7 @@ def check_for_exceptions(args):
     if args.cookiefile:
         f = open(args.cookiefile, 'r')
         try:
-            data = f.read()
+            f.read()
         except UnreadableFile():
             pass
         finally:

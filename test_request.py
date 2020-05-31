@@ -1,4 +1,4 @@
-from client import request
+from client import request as req
 import argparse
 import unittest
 
@@ -21,7 +21,7 @@ class TestHTTPClient(unittest.TestCase):
 
     def test_check_get_request(self):
         args = self.parser.parse_args(['http://ptsv2.com/t/lp5td-1586273836/post'])
-        request = Request(args.url,
+        request = req.Request(args.url,
                       args.reference,
                       args.data,
                       args.verbose,
@@ -42,7 +42,7 @@ class TestHTTPClient(unittest.TestCase):
         args = self.parser.parse_args(['-d', 'Hello, World!',
                                             'http://ptsv2.com/t/lp5td-1586273836/post',
                                             '-r', 'POST'])
-        request = Request(args.url,
+        request = req.Request(args.url,
                       args.reference,
                       args.data,
                       args.verbose,
@@ -64,7 +64,7 @@ class TestHTTPClient(unittest.TestCase):
     def test_check_get_request_with_reference(self):
         args = self.parser.parse_args(['-e', 'http://ptsv2.com/t/lp5td-1586273836',
                                             'http://ptsv2.com/t/lp5td-1586273836/post'])
-        request = Request(args.url,
+        request = req.Request(args.url,
                       args.reference,
                       args.data,
                       args.verbose,
@@ -90,7 +90,7 @@ class TestHTTPClient(unittest.TestCase):
         f = open('test_text.txt', 'w')
         f.write("Hello, my name is trail")
         f.close()
-        request = Request(args.url,
+        request = req.Request(args.url,
                       args.reference,
                       args.data,
                       args.verbose,
@@ -112,7 +112,7 @@ class TestHTTPClient(unittest.TestCase):
     def test_check_get_request_with_user_agent(self):
         args = self.parser.parse_args(['http://ptsv2.com/t/lp5td-1586273836/post',
                                             '-A', 'Mozilla/5.0'])
-        request = Request(args.url,
+        request = req.Request(args.url,
                       args.reference,
                       args.data,
                       args.verbose,
@@ -135,7 +135,7 @@ class TestHTTPClient(unittest.TestCase):
         args = self.parser.parse_args(['http://ptsv2.com/t/lp5td-1586273836/post',
                                             '-A', 'Mozilla/5.0',
                                             '-c', 'income=1'])
-        request = Request(args.url,
+        request = req.Request(args.url,
                       args.reference,
                       args.data,
                       args.verbose,
