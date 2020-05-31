@@ -1,7 +1,5 @@
 import socket
 import ssl
-import argparse
-import re
 import response
 from yarl import URL
 

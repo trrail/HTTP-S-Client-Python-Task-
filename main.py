@@ -1,6 +1,5 @@
 from request import Request
 import argparse
-import re
 import errors
 
 
