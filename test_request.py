@@ -1,4 +1,4 @@
-from request import Request
+from client import request
 import argparse
 import unittest
 

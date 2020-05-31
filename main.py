@@ -1,6 +1,6 @@
-from request import Request
+from client import request as req
 import argparse
-import errors
+from client import errors
 
 
 parser = argparse.ArgumentParser(description='HTTP(S) - Client')
@@ -22,7 +22,7 @@ parser.add_argument('-1', '--headignore', action='store_true', help='ignore head
 def make_request():
     args = parser.parse_args()
     errors.check_for_exceptions(args)
-    request = Request(args.url,
+    request = req.Request(args.url,
                       args.reference,
                       args.data,
                       args.verbose,
