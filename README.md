@@ -9,7 +9,7 @@
 * You can add: cookie, user-agent, headers and reference 
 -----------------------------------------------------------------------------------------------------------------------------------  
 ## How it works:
-* You should print in terminal: python make_request.py url args
+* You should print in terminal: python main.py url args
 -----------------------------------------------------------------------------------------------------------------------------------
 
 | Argument |                 Action              |                               Using Examples                     | 
