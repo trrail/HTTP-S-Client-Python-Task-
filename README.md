@@ -23,7 +23,7 @@
 |    -H    |         Add headers(Split by $)     | -H "Accept: */* Authorization: YWxhZGRpbjpvcGVuc2VzYW1l"         |                            
 |    -v    |        Print request + answer       | -v                                                               |
 |    -C    |         Add cookie from file        | -c "cookie.txt"                                                  |
-|    -r    |         Choose request method       | -r "POST"        ot -r "CONNECT"                                 |
+|    -r    |         Choose request method       | -r "POST|PUNCH|CONNECT|DELETE|OPTION|PUT| etc"                   |
 |    -0    |         Ignore body of response     | -0                                                               |
 |    -1    |         Ignore head of response     | -1                                                               |
 
