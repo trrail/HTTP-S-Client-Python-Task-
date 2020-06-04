@@ -1,6 +1,7 @@
 import socket
 import ssl
 from client import response
+from client import errors
 from yarl import URL
 
 
@@ -17,7 +18,8 @@ class Request():
                  request=None,
                  cookie_file=None,
                  body_ignore=None,
-                 head_ignore=None):
+                 head_ignore=None,
+                 timeout=None):
         self._url = URL(url)
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._data = data
@@ -33,25 +35,37 @@ class Request():
         self._headers = {}
         self._body_ignore = body_ignore
         self._head_ignore = head_ignore
+        self._timeout = timeout if timeout else '1000'
         self._request_type = request if request else "GET"
+        try:
+            if not self._request_type in ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS", "CONNECT", "TRACE"]:
+                raise errors.IncorrectRequestType()
+        except errors.IncorrectRequestType as e:
+            print(e.message)
+            exit()
         if self._url.scheme == 'https':
             self.__sock = ssl.wrap_socket(self.__sock)
 
     def do_request(self):
         self.prepare_headers()
         request = self.make_request()
-        self.__sock.connect((self._url.host, self._url.port))
-        if self._url.scheme == 'https':
-            self.__sock.do_handshake()
-        self.__sock.sendall(request.encode())
-        answer = ''
-        while True:
-            data = self.__sock.recv(1024)
-            if not data:
-                break
-            answer += data.decode("ISO-8859-1")
-        self.__sock.close()
-        self.print_answer(answer=answer, request=request)
+        try:
+            self.__sock.connect((self._url.host, self._url.port))
+        except BaseException:
+            print(errors.ConnectionError.message)
+        else:
+            self.__sock.settimeout(int(self._timeout))
+            if self._url.scheme == 'https':
+                self.__sock.do_handshake()
+            self.__sock.sendall(request.encode())
+            answer = ''
+            while True:
+                data = self.__sock.recv(1024)
+                if not data:
+                    break
+                answer += data.decode("ISO-8859-1")
+            self.__sock.close()
+            self.print_answer(answer=answer, request=request)
 
     def prepare_headers(self):
         if self._input_headers:

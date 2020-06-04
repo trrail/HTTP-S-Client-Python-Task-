@@ -5,7 +5,16 @@ from client import errors
 
 parser = argparse.ArgumentParser(description='HTTP(S) - Client')
 parser.add_argument('-d', '--data', type=str, help='data for request')
-parser.add_argument('-r', '--request', type=str, help='choose request method')
+parser.add_argument('-r', '--request', type=str, help='choose request method:'
+                                                      'GET|'
+                                                      'POST|'
+                                                      'PUT|'
+                                                      'CONNECT|'
+                                                      'PATCH|'
+                                                      'OPTIONS|'
+                                                      'DELETE|'
+                                                      'HEAD|'
+                                                      'TRACE')
 parser.add_argument('url', type=str, help='Contains URL')
 parser.add_argument('-e', '--reference', type=str, help='add previous URL')
 parser.add_argument('-v', '--verbose', action='store_true', help='detailed response')
@@ -17,6 +26,7 @@ parser.add_argument('-O', '--output', type=str, help='print answer in file')
 parser.add_argument('-H', '--headers', type=str, nargs="+", help='add headers in request', dest="my_headers")
 parser.add_argument('-0', '--bodyignore', action='store_true', help='ignore body of response')
 parser.add_argument('-1', '--headignore', action='store_true', help='ignore head of response')
+parser.add_argument('-t', '--timeout', type=str, help='reset timeout')
 
 
 def make_request():
@@ -34,7 +44,8 @@ def make_request():
                       args.request,
                       args.cookiefile,
                       args.bodyignore,
-                      args.headignore)
+                      args.headignore,
+                          args.timeout)
     request.do_request()
 
 
