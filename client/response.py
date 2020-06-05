@@ -10,6 +10,7 @@ class Response():
         self._head_response = ''
         self._body_response = ''
         self._location = ''
+        self._prepared_response = []
 
     def read_response(self, data):
         if len(self._byte_array) == 0:
@@ -19,9 +20,9 @@ class Response():
 
     def head_of_response(self, data):
         response = data.decode("ISO-8859-1")
-        spliter = response.split('\r\n')
-        self._re_code = spliter[0].split(' ')[1]
-        for i in spliter:
+        splited_head = response.split('\r\n')
+        self._re_code = splited_head[0].split(' ')[1]
+        for i in splited_head:
             if i[:8:] == 'Location' or i[:8:] == 'location':
                 self._location = i.split(': ')[1]
             if i[:12:] == 'Content-Type' or i[:12:] == 'content-type':
@@ -36,11 +37,10 @@ class Response():
         self._response = self._byte_array.decode(self._charset)
         self._head_response = re.split(r'\r\n\r\n', self._response)[0]
         self._body_response = re.split(r'\r\n\r\n', self._response)[1]
-        prepared_response = []
-        prepared_response.append(self._response)
-        prepared_response.append(self._head_response)
-        prepared_response.append(self._body_response)
-        prepared_response.append(self._byte_array)
-        prepared_response.append(self._location)
-        return prepared_response
+        self._prepared_response.append(self._response)
+        self._prepared_response.append(self._head_response)
+        self._prepared_response.append(self._body_response)
+        self._prepared_response.append(self._byte_array)
+        self._prepared_response.append(self._location)
+        return self._prepared_response
 
