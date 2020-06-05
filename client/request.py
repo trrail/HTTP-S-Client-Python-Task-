@@ -38,7 +38,7 @@ class Request():
         self._timeout = timeout if timeout else '1000'
         self._request_type = request if request else "GET"
         try:
-            if not self._request_type in ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS", "CONNECT", "TRACE"]:
+            if self._request_type not in ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS", "CONNECT", "TRACE"]:
                 raise errors.IncorrectRequestType()
         except errors.IncorrectRequestType as e:
             print(e.message)
@@ -58,14 +58,14 @@ class Request():
             if self._url.scheme == 'https':
                 self.__sock.do_handshake()
             self.__sock.sendall(request.encode())
-            answer = ''
+            new_response = response.Response()
             while True:
-                data = self.__sock.recv(1024)
+                data = self.__sock.recv(512)
                 if not data:
                     break
-                answer += data.decode("ISO-8859-1")
+                new_response.read_response(data)
+            new_response.print_response()
             self.__sock.close()
-            self.print_answer(answer=answer, request=request)
 
     def prepare_headers(self):
         if self._input_headers:
@@ -84,15 +84,6 @@ class Request():
             f.close()
         if self._agent:
             self._headers["User-Agent"] = self._agent
-
-    def print_answer(self, answer, request):
-        new_response = response.Response(answer,
-                                         request,
-                                         self._verbose,
-                                         self._output,
-                                         self._body_ignore,
-                                         self._head_ignore)
-        new_response.handle_response()
 
     def prepare_data(self):
         data = ''
