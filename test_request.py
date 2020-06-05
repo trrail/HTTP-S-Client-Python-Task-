@@ -1,7 +1,8 @@
 from client import request as req
 import argparse
 import unittest
-
+from client import errors as er
+from client import response as res
 
 class TestHTTPClient(unittest.TestCase):
     parser = argparse.ArgumentParser(description='HTTP(S) - Client')
@@ -18,22 +19,24 @@ class TestHTTPClient(unittest.TestCase):
     parser.add_argument('-H', '--headers', type=str, nargs="+", help='add headers in request', dest="my_headers")
     parser.add_argument('-0', '--bodyignore', action='store_true', help='ignore body of response')
     parser.add_argument('-1', '--headignore', action='store_true', help='ignore head of response')
+    parser.add_argument('-t', '--timeout', type=str, help='reset timeout')
 
     def test_check_get_request(self):
         args = self.parser.parse_args(['http://ptsv2.com/t/lp5td-1586273836/post'])
         request = req.Request(args.url,
-                      args.reference,
-                      args.data,
-                      args.verbose,
-                      args.file,
-                      args.cookie,
-                      args.agent,
-                      args.output,
-                      args.my_headers,
-                      args.request,
-                      args.cookiefile,
-                      args.bodyignore,
-                      args.headignore)
+                              args.reference,
+                              args.data,
+                              args.verbose,
+                              args.file,
+                              args.cookie,
+                              args.agent,
+                              args.output,
+                              args.my_headers,
+                              args.request,
+                              args.cookiefile,
+                              args.bodyignore,
+                              args.headignore,
+                              args.timeout)
         self.assertEqual('GET /t/lp5td-1586273836/post HTTP/1.1\r\n'
                          'Host: ptsv2.com\r\n'
                          'Connection: close\r\n\r\n', request.make_request())
@@ -43,18 +46,19 @@ class TestHTTPClient(unittest.TestCase):
                                             'http://ptsv2.com/t/lp5td-1586273836/post',
                                             '-r', 'POST'])
         request = req.Request(args.url,
-                      args.reference,
-                      args.data,
-                      args.verbose,
-                      args.file,
-                      args.cookie,
-                      args.agent,
-                      args.output,
-                      args.my_headers,
-                      args.request,
-                      args.cookiefile,
-                      args.bodyignore,
-                      args.headignore)
+                              args.reference,
+                              args.data,
+                              args.verbose,
+                              args.file,
+                              args.cookie,
+                              args.agent,
+                              args.output,
+                              args.my_headers,
+                              args.request,
+                              args.cookiefile,
+                              args.bodyignore,
+                              args.headignore,
+                              args.timeout)
         self.assertEqual('POST /t/lp5td-1586273836/post HTTP/1.1\r\n'
                          'Host: ptsv2.com\r\n'
                          'Connection: close\r\n'
@@ -65,18 +69,19 @@ class TestHTTPClient(unittest.TestCase):
         args = self.parser.parse_args(['-e', 'http://ptsv2.com/t/lp5td-1586273836',
                                             'http://ptsv2.com/t/lp5td-1586273836/post'])
         request = req.Request(args.url,
-                      args.reference,
-                      args.data,
-                      args.verbose,
-                      args.file,
-                      args.cookie,
-                      args.agent,
-                      args.output,
-                      args.my_headers,
-                      args.request,
-                      args.cookiefile,
-                      args.bodyignore,
-                      args.headignore)
+                              args.reference,
+                              args.data,
+                              args.verbose,
+                              args.file,
+                              args.cookie,
+                              args.agent,
+                              args.output,
+                              args.my_headers,
+                              args.request,
+                              args.cookiefile,
+                              args.bodyignore,
+                              args.headignore,
+                              args.timeout)
         request.prepare_headers()
         self.assertEqual('GET /t/lp5td-1586273836/post HTTP/1.1\r\n'
                          'Host: ptsv2.com\r\n'
@@ -91,18 +96,19 @@ class TestHTTPClient(unittest.TestCase):
         f.write("Hello, my name is trail")
         f.close()
         request = req.Request(args.url,
-                      args.reference,
-                      args.data,
-                      args.verbose,
-                      args.file,
-                      args.cookie,
-                      args.agent,
-                      args.output,
-                      args.my_headers,
-                      args.request,
-                      args.cookiefile,
-                      args.bodyignore,
-                      args.headignore)
+                              args.reference,
+                              args.data,
+                              args.verbose,
+                              args.file,
+                              args.cookie,
+                              args.agent,
+                              args.output,
+                              args.my_headers,
+                              args.request,
+                              args.cookiefile,
+                              args.bodyignore,
+                              args.headignore,
+                              args.timeout)
         self.assertEqual('POST /t/lp5td-1586273836/post HTTP/1.1\r\n'
                          'Host: ptsv2.com\r\n'
                          'Connection: close\r\n'
@@ -113,18 +119,19 @@ class TestHTTPClient(unittest.TestCase):
         args = self.parser.parse_args(['http://ptsv2.com/t/lp5td-1586273836/post',
                                             '-A', 'Mozilla/5.0'])
         request = req.Request(args.url,
-                      args.reference,
-                      args.data,
-                      args.verbose,
-                      args.file,
-                      args.cookie,
-                      args.agent,
-                      args.output,
-                      args.my_headers,
-                      args.request,
-                      args.cookiefile,
-                      args.bodyignore,
-                      args.headignore)
+                              args.reference,
+                              args.data,
+                              args.verbose,
+                              args.file,
+                              args.cookie,
+                              args.agent,
+                              args.output,
+                              args.my_headers,
+                              args.request,
+                              args.cookiefile,
+                              args.bodyignore,
+                              args.headignore,
+                              args.timeout)
         request.prepare_headers()
         self.assertEqual('GET /t/lp5td-1586273836/post HTTP/1.1\r\n'
                          'Host: ptsv2.com\r\n'
@@ -136,24 +143,58 @@ class TestHTTPClient(unittest.TestCase):
                                             '-A', 'Mozilla/5.0',
                                             '-c', 'income=1'])
         request = req.Request(args.url,
-                      args.reference,
-                      args.data,
-                      args.verbose,
-                      args.file,
-                      args.cookie,
-                      args.agent,
-                      args.output,
-                      args.my_headers,
-                      args.request,
-                      args.cookiefile,
-                      args.bodyignore,
-                      args.headignore)
+                              args.reference,
+                              args.data,
+                              args.verbose,
+                              args.file,
+                              args.cookie,
+                              args.agent,
+                              args.output,
+                              args.my_headers,
+                              args.request,
+                              args.cookiefile,
+                              args.bodyignore,
+                              args.headignore,
+                              args.timeout)
         request.prepare_headers()
         self.assertEqual('GET /t/lp5td-1586273836/post HTTP/1.1\r\n'
                          'Host: ptsv2.com\r\n'
                          'Connection: close\r\n'
                          'Cookie: income=1\r\n'
                          'User-Agent: Mozilla/5.0\r\n\r\n', request.make_request())
+
+    def test_connection_error(self):
+        args = self.parser.parse_args(['tralala',
+                                       '-v', '-1'])
+        request = req.Request(args.url,
+                              args.reference,
+                              args.data,
+                              args.verbose,
+                              args.file,
+                              args.cookie,
+                              args.agent,
+                              args.output,
+                              args.my_headers,
+                              args.request,
+                              args.cookiefile,
+                              args.bodyignore,
+                              args.headignore,
+                              args.timeout)
+        self.assertRaises(er.ConnectionError, request.do_request())
+
+    def test_response(self):
+        text = 'HTTP/1.1 200 Ok\r\n' \
+               'Server: VK\r\n' \
+               'Connection: close\r\n' \
+               'Content-Type: text/html; charset=UTF-8\r\n\r\nHello'
+        response = res.Response()
+        response.read_response(text.encode('utf-8'))
+        re = response.return_response()
+        self.assertEqual(re[0], text)
+        self.assertEqual(re[1], text.split('\r\n\r\n')[0])
+        self.assertEqual(re[2], text.split('\r\n\r\n')[1])
+        self.assertEqual(re[3], text.encode('utf-8'))
+        self.assertEqual(re[4], '')
 
 
 if __name__ == '__main__':

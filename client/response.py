@@ -1,4 +1,5 @@
 import re
+from client import errors as er
 
 
 class Response():
@@ -22,6 +23,12 @@ class Response():
         response = data.decode("ISO-8859-1")
         splited_head = response.split('\r\n')
         self._re_code = splited_head[0].split(' ')[1]
+        try:
+            if self._re_code[:1:] == '4':
+                raise er.ConnectionError()
+        except er.ConnectionError:
+            print(er.ConnectionError.message)
+            exit()
         for i in splited_head:
             if i[:8:] == 'Location' or i[:8:] == 'location':
                 self._location = i.split(': ')[1]
