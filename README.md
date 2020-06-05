@@ -17,7 +17,7 @@
 |    -d    |            Send data                | -d "Hello, World!"                                               |
 |    -f    |         Send data from file         | -f "test.txt"                                                    |
 |    -e    |       Add reference in request      | -e "https://github.com/trrail/python-tasks/edit/master/README.md"|
-|    -O    |         Write answer in file        | -O "test.txt"                                                    |
+|    -O    |         Write answer in file        | -O "test.txt"   (function is temporarily unavailable)            |
 |    -A    |       Add User-Agent in request     | -A "Mozilla/5.0"                                                 |
 |    -c    |         Add cookie in request       | -c "income=1"                                                    |
 |    -H    |         Add headers(Split by $)     | -H "Accept: */* Authorization: YWxhZGRpbjpvcGVuc2VzYW1l"         |                            
@@ -26,4 +26,8 @@
 |    -r    |         Choose request method       | -r "POST|PUNCH|CONNECT|DELETE|OPTION|PUT| etc"                   |
 |    -0    |         Ignore body of response     | -0                                                               |
 |    -1    |         Ignore head of response     | -1                                                               |
+|    -t    |            Set timeout              | -t 3000                                                          |
+
+## Developer
+  Was created by Meshcheryakov G. known as trrail
 
