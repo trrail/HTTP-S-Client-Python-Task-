@@ -65,9 +65,26 @@ class Request():
                 if not data:
                     break
                 new_response.read_response(data)
-            re = new_response.return_response()
-            self.show_response(request, re)
             self.__sock.close()
+            re = new_response.return_response()
+            if not re[4] == '':
+                request = Request(re[4],
+                                  self._reference,
+                                  self._data,
+                                  self._verbose,
+                                  self._file,
+                                  self._cookie,
+                                  self._agent,
+                                  self._output,
+                                  self._headers,
+                                  self._request_type,
+                                  self._cookie_from_file,
+                                  self._body_ignore,
+                                  self._head_ignore,
+                                  self._timeout)
+                request.do_request()
+            else:
+                self.show_response(request, re)
 
     def show_response(self, request, prepared_response):
         if self._verbose:

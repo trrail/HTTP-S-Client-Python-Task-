@@ -9,6 +9,7 @@ class Response():
         self._re_code = ''
         self._head_response = ''
         self._body_response = ''
+        self._location = ''
 
     def read_response(self, data):
         if len(self._byte_array) == 0:
@@ -21,8 +22,14 @@ class Response():
         spliter = response.split('\r\n')
         self._re_code = spliter[0].split(' ')[1]
         for i in spliter:
+            if i[:8:] == 'Location' or i[:8:] == 'location':
+                self._location = i.split(': ')[1]
             if i[:12:] == 'Content-Type' or i[:12:] == 'content-type':
-                self._charset = i.split(': ')[1].split('; ')[1][8::]
+                self._charset = i.split(': ')[1].split('; ')
+                if len(self._charset) == 1:
+                    self._charset = 'UTF-8'
+                else:
+                    self._charset = self._charset[1][8::]
         self._byte_array.extend(data)
 
     def return_response(self):
@@ -34,5 +41,6 @@ class Response():
         prepared_response.append(self._head_response)
         prepared_response.append(self._body_response)
         prepared_response.append(self._byte_array)
+        prepared_response.append(self._location)
         return prepared_response
 
