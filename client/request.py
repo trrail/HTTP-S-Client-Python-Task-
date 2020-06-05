@@ -3,6 +3,7 @@ import ssl
 from client import response
 from client import errors
 from yarl import URL
+import sys
 
 
 class Request():
@@ -60,12 +61,24 @@ class Request():
             self.__sock.sendall(request.encode())
             new_response = response.Response()
             while True:
-                data = self.__sock.recv(512)
+                data = self.__sock.recv(2048)
                 if not data:
                     break
                 new_response.read_response(data)
-            new_response.print_response()
+            re = new_response.return_response()
+            self.show_response(request, re)
             self.__sock.close()
+
+    def show_response(self, request, prepared_response):
+        if self._verbose:
+            sys.stdout.write(request + '\r\n')
+            sys.stdout.buffer.write(prepared_response[3])
+        elif self._body_ignore:
+            sys.stdout.write(prepared_response[1])
+        elif self._head_ignore:
+            sys.stdout.write(prepared_response[2])
+        else:
+            sys.stdout.write(prepared_response[0])
 
     def prepare_headers(self):
         if self._input_headers:

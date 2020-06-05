@@ -7,9 +7,8 @@ class Response():
         self._response = ''
         self._charset = ''
         self._re_code = ''
-        '''
-        self._response_head = re.split(r'\r\n\r\n', response)[0]
-        '''
+        self._head_response = ''
+        self._body_response = ''
 
     def read_response(self, data):
         if len(self._byte_array) == 0:
@@ -26,6 +25,14 @@ class Response():
                 self._charset = i.split(': ')[1].split('; ')[1][8::]
         self._byte_array.extend(data)
 
-    def print_response(self):
-        print(self._byte_array.decode(self._charset))
+    def return_response(self):
+        self._response = self._byte_array.decode(self._charset)
+        self._head_response = re.split(r'\r\n\r\n', self._response)[0]
+        self._body_response = re.split(r'\r\n\r\n', self._response)[1]
+        prepared_response = []
+        prepared_response.append(self._response)
+        prepared_response.append(self._head_response)
+        prepared_response.append(self._body_response)
+        prepared_response.append(self._byte_array)
+        return prepared_response
 
