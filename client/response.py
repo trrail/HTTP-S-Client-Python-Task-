@@ -2,9 +2,6 @@ import re
 from client import errors as er
 
 
-pattern = re.compile(r'.*: .*')
-
-
 class Response():
     def __init__(self):
         self._response = bytearray()
