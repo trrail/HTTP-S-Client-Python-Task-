@@ -47,7 +47,6 @@ class Response():
         except UnicodeDecodeError:
             print(er.ConnectionError.message)
 
-
     @response.setter
     def response(self, value):
         self._response.extend(value)

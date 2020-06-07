@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="337f1714-abe4-47d5-ab07-e32701387270" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/client/request.py" beforeDir="false" afterPath="$PROJECT_DIR$/client/request.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/response.py" beforeDir="false" afterPath="$PROJECT_DIR$/client/response.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

@@ -94,7 +94,8 @@ class Request():
         elif self._verbose:
             sys.stdout.write(f'{self._request} \r\n{new_response.response}')
         else:
-            sys.stdout.write(new_response.response)
+            if new_response.response:
+                sys.stdout.write(new_response.response)
 
     def prepare_headers(self):
         if self._input_headers:
