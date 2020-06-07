@@ -2,52 +2,59 @@ import re
 from client import errors as er
 
 
+pattern = re.compile(r'.*: .*')
+
+
 class Response():
     def __init__(self):
-        self._byte_array = bytearray()
-        self._response = ''
-        self._charset = ''
-        self._re_code = ''
-        self._head_response = ''
-        self._body_response = ''
+        self._response = bytearray()
+        self._charset = "utf-8"
+        self._code = ''
         self._location = ''
-        self._prepared_response = []
+        self._headers = {}
+        self._content_length = 0
 
-    def read_response(self, data):
-        if len(self._byte_array) == 0:
-            self.head_of_response(data)
-        else:
-            self._byte_array.extend(data)
-
-    def head_of_response(self, data):
+    def prepare_headers(self, data):
+        self._response.extend(data)
         response = data.decode("ISO-8859-1")
-        splited_head = response.split('\r\n')
-        self._re_code = splited_head[0].split(' ')[1]
+        self._code = (re.search(r' [\d]* ', response)).group(0)
+        for i in response.split('\r\n'):
+            s = re.search(r'(?P<header>[a-zA-Z-]*): (?P<value>[0-9\s\w,.;=/:-]*)', i)
+            if s is not None:
+                self._headers[s.group('header')] = s.group('value')
+                if s.group('header') == 'Content-Length' or s.group('header') == 'content-length':
+                    self._content_length = int(s.group('value'))
+                if s.group('header') == 'Content-Type' or s.group('header') == 'content-type':
+                    f = re.search(r'[a-zA-z/]*; charset=(?P<charset>[\w\d-]*)', s.group('value'))
+                    if f is not None:
+                        self._charset = f.group('charset')
+                if s.group('header') == 'Location' or s.group('header') == 'location':
+                    self._location = s.group('value')
+
+    response = property()
+    location = property()
+    headers = property()
+
+    @headers.getter
+    def headers(self):
+        return self._headers
+
+    @location.getter
+    def location(self):
+        return self._location
+
+    @response.getter
+    def response(self):
         try:
-            if self._re_code[:1:] == '4':
-                raise er.ConnectionError()
-        except er.ConnectionError:
+            return self._response.decode(self._charset)
+        except UnicodeDecodeError:
             print(er.ConnectionError.message)
-            exit()
-        for i in splited_head:
-            if i[:8:] == 'Location' or i[:8:] == 'location':
-                self._location = i.split(': ')[1]
-            if i[:12:] == 'Content-Type' or i[:12:] == 'content-type':
-                self._charset = i.split(': ')[1].split('; ')
-                if len(self._charset) == 1:
-                    self._charset = 'UTF-8'
-                else:
-                    self._charset = self._charset[1][8::]
-        self._byte_array.extend(data)
 
-    def return_response(self):
-        self._response = self._byte_array.decode(self._charset)
-        self._head_response = re.split(r'\r\n\r\n', self._response)[0]
-        self._body_response = re.split(r'\r\n\r\n', self._response)[1]
-        self._prepared_response.append(self._response)
-        self._prepared_response.append(self._head_response)
-        self._prepared_response.append(self._body_response)
-        self._prepared_response.append(self._byte_array)
-        self._prepared_response.append(self._location)
-        return self._prepared_response
 
+    @response.setter
+    def response(self, value):
+        self._response.extend(value)
+
+    @property
+    def content_length(self):
+        return self._content_length

@@ -4,6 +4,7 @@ from client import response
 from client import errors
 from yarl import URL
 import sys
+import os
 
 
 class Request():
@@ -38,64 +39,62 @@ class Request():
         self._head_ignore = head_ignore
         self._timeout = timeout if timeout else '1000'
         self._request_type = request if request else "GET"
+        self._request = ''
         try:
             if self._request_type not in ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS", "CONNECT", "TRACE"]:
                 raise errors.IncorrectRequestType()
         except errors.IncorrectRequestType as e:
             print(e.message)
-            exit()
+            exit(1)
         if self._url.scheme == 'https':
             self.__sock = ssl.wrap_socket(self.__sock)
 
     def do_request(self):
         self.prepare_headers()
-        request = self.make_request()
-        try:
-            self.__sock.connect((self._url.host, self._url.port))
-        except BaseException:
-            print(errors.ConnectionError.message)
+        self.make_request()
+        self.__sock.connect((self._url.host, self._url.port))
+        self.__sock.settimeout(int(self._timeout))
+        if self._url.scheme == 'https':
+            self.__sock.do_handshake()
+        self.__sock.sendall(self._request.encode())
+        new_response = response.Response()
+        data = self.__sock.recv(2048)
+        new_response.prepare_headers(data)
+        if new_response.content_length - 2048 > 0:
+            data = self.__sock.recv(new_response.content_length - 2048)
+            new_response.response = data
+        self.__sock.close()
+        if not new_response.location == '':
+            request = Request(new_response.location,
+                              self._reference,
+                              self._data,
+                              self._verbose,
+                              self._file,
+                              self._cookie,
+                              self._agent,
+                              self._output,
+                              self._headers,
+                              self._request_type,
+                              self._cookie_from_file,
+                              self._body_ignore,
+                              self._head_ignore,
+                              self._timeout)
+            request.do_request()
         else:
-            self.__sock.settimeout(int(self._timeout))
-            if self._url.scheme == 'https':
-                self.__sock.do_handshake()
-            self.__sock.sendall(request.encode())
-            new_response = response.Response()
-            while True:
-                data = self.__sock.recv(2048)
-                if not data:
-                    break
-                new_response.read_response(data)
-            self.__sock.close()
-            re = new_response.return_response()
-            if not re[4] == '':
-                request = Request(re[4],
-                                  self._reference,
-                                  self._data,
-                                  self._verbose,
-                                  self._file,
-                                  self._cookie,
-                                  self._agent,
-                                  self._output,
-                                  self._headers,
-                                  self._request_type,
-                                  self._cookie_from_file,
-                                  self._body_ignore,
-                                  self._head_ignore,
-                                  self._timeout)
-                request.do_request()
-            else:
-                self.show_response(request, re)
+            self.show_response(new_response)
 
-    def show_response(self, request, prepared_response):
-        if self._verbose:
-            sys.stdout.write(request + '\r\n')
-            sys.stdout.buffer.write(prepared_response[3])
-        elif self._body_ignore:
-            sys.stdout.write(prepared_response[1])
+    def show_response(self,new_response):
+        if self._body_ignore:
+            response = [f'{new_response.response[:15]}']
+            for header, value in new_response.headers.items():
+                response.append(f'{header}: {value}')
+            sys.stdout.write('\r\n'.join(response))
         elif self._head_ignore:
-            sys.stdout.write(prepared_response[2])
+            sys.stdout.write(new_response.response.split('\r\n\r\n')[1])
+        elif self._verbose:
+            sys.stdout.write(f'{self._request} \r\n{new_response.response}')
         else:
-            sys.stdout.write(prepared_response[0])
+            sys.stdout.write(new_response.response)
 
     def prepare_headers(self):
         if self._input_headers:
@@ -126,14 +125,14 @@ class Request():
         return data
 
     def make_request(self):
-        request = f'{self._request_type} {self._url.path} {self._protocol}\r\n' \
-                    f'Host: {self._url.host}\r\n' \
-                    f'Connection: close\r\n'
+        request = [f'{self._request_type} {self._url.path} {self._protocol}']
+        request.append(f'Host: {self._url.host}')
+        request.append(f'Connection: close')
         for header, value in self._headers.items():
-            request = ''.join((request, header, ': ', value, '\r\n'))
+            request.append(f'{header}: {value}')
         body = self.prepare_data()
         if len(body) != 0:
-            request = ''.join((request, 'Content-Length: ', str(len(body)), '\r\n\r\n', body, '\r\n'))
-        else:
-            request = ''.join((request, '\r\n'))
-        return request
+            request.append(f'Content-Length: {len(body)}')
+        request.append('')
+        request.append(f'{body}')
+        self._request = '\r\n'.join(request)
