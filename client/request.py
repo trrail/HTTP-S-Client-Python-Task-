@@ -4,7 +4,6 @@ from client import response
 from client import errors
 from yarl import URL
 import sys
-import os
 
 
 class Request():
@@ -52,7 +51,11 @@ class Request():
     def do_request(self):
         self.prepare_headers()
         self.make_request()
-        self.__sock.connect((self._url.host, self._url.port))
+        try:
+            self.__sock.connect((self._url.host, self._url.port))
+        except Exception:
+            print(errors.ConnectionError.message)
+            exit(1)
         self.__sock.settimeout(int(self._timeout))
         if self._url.scheme == 'https':
             self.__sock.do_handshake()

@@ -1,7 +1,7 @@
 import os
 
 
-class HTTPSClientException(BaseException):
+class HTTPSClientException(Exception):
     pass
 
 class DataFromFileAndFromString(HTTPSClientException):
