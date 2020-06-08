@@ -17,7 +17,7 @@
 |    -d    |            Send data                | -d "Hello, World!"                                               |
 |    -f    |         Send data from file         | -f "test.txt"                                                    |
 |    -e    |       Add reference in request      | -e "https://github.com/trrail/python-tasks/edit/master/README.md"|
-|    -O    |         Write answer in file        | -O "test.txt"   (function is temporarily unavailable)            |
+|    -O    |         Write answer in file        | -O "test.txt           |
 |    -A    |       Add User-Agent in request     | -A "Mozilla/5.0"                                                 |
 |    -c    |         Add cookie in request       | -c "income=1"                                                    |
 |    -H    |         Add headers(Split by $)     | -H "Accept: */* Authorization: YWxhZGRpbjpvcGVuc2VzYW1l"         |                            
