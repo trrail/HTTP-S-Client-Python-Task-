@@ -1,6 +1,8 @@
 from client import request as req
 import argparse
 from client import errors
+from client import response as res
+import sys
 
 
 parser = argparse.ArgumentParser(description='HTTP(S) - Client')
@@ -35,7 +37,6 @@ def make_request():
     request = req.Request(args.url,
                       args.reference,
                       args.data,
-                      args.verbose,
                       args.file,
                       args.cookie,
                       args.agent,
@@ -43,10 +44,23 @@ def make_request():
                       args.my_headers,
                       args.request,
                       args.cookiefile,
-                      args.bodyignore,
-                      args.headignore,
                           args.timeout)
-    request.do_request()
+    answer = request.do_request()
+    show_response(answer[0], answer[1], args.bodyignore, args.headignore, args.verbose)
+
+
+def show_response(request, response, body_ignore, head_ignore, verbose):
+    if body_ignore:
+        answer = [f'{response.response.decode(response.charset)[:15]}']
+        for header, value in response.headers.items():
+            answer.append(f'{header}: {value}')
+        sys.stdout.write('\r\n'.join(answer))
+    elif head_ignore:
+        sys.stdout.write(response.message)
+    elif verbose:
+        sys.stdout.write(f'{request} \r\n{response.response.decode(response.charset)}')
+    else:
+        sys.stdout.write(response.response.decode(response.charset))
 
 
 if __name__ == '__main__':

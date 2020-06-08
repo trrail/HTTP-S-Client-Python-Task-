@@ -1,6 +1,6 @@
 import socket
 import ssl
-from client import response
+from client import response as res
 from client import errors
 from yarl import URL
 import sys
@@ -10,7 +10,6 @@ class Request():
     def __init__(self, url=None,
                  reference=None,
                  data=None,
-                 verbose=None,
                  file=None,
                  cookie=None,
                  agent=None,
@@ -18,14 +17,11 @@ class Request():
                  headers=None,
                  request=None,
                  cookie_file=None,
-                 body_ignore=None,
-                 head_ignore=None,
                  timeout=None):
         self._url = URL(url)
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._data = data
         self._reference = reference
-        self._verbose = verbose
         self._file = file
         self._protocol = "HTTP/1.1"
         self._cookie = cookie
@@ -34,11 +30,10 @@ class Request():
         self._cookie_from_file = cookie_file
         self._input_headers = headers
         self._headers = {}
-        self._body_ignore = body_ignore
-        self._head_ignore = head_ignore
         self._timeout = timeout if timeout else '1000'
         self._request_type = request if request else "GET"
         self._request = ''
+        self._response = bytearray()
         try:
             if self._request_type not in ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS", "CONNECT", "TRACE"]:
                 raise errors.IncorrectRequestType()
@@ -60,24 +55,17 @@ class Request():
         if self._url.scheme == 'https':
             self.__sock.do_handshake()
         self.__sock.sendall(self._request.encode())
-        new_response = response.Response()
-        data = self.__sock.recv(2048)
-        new_response.prepare_headers(data)
-        if new_response.content_length - 2048 > 0:
-            data = self.__sock.recv(new_response.content_length - 2048)
-            new_response.response = data
-        if new_response.chunk > 0:
-            while True:
-                data = self.__sock.recv(new_response.chunk)
-                if not data:
-                    break
-                new_response.response = data
+        while True:
+            data = self.__sock.recv(1024)
+            if not data:
+                break
+            self._response.extend(data)
         self.__sock.close()
-        if not new_response.location == '':
-            request = Request(new_response.location,
+        response = res.Response(self._response)
+        if not response.location == '':
+            request = Request(response.location,
                               self._reference,
                               self._data,
-                              self._verbose,
                               self._file,
                               self._cookie,
                               self._agent,
@@ -85,26 +73,10 @@ class Request():
                               self._headers,
                               self._request_type,
                               self._cookie_from_file,
-                              self._body_ignore,
-                              self._head_ignore,
                               self._timeout)
-            request.do_request()
+            return request.do_request()
         else:
-            self.show_response(new_response)
-
-    def show_response(self,new_response):
-        if self._body_ignore:
-            response = [f'{new_response.response[:15]}']
-            for header, value in new_response.headers.items():
-                response.append(f'{header}: {value}')
-            sys.stdout.write('\r\n'.join(response))
-        elif self._head_ignore:
-            sys.stdout.write(new_response.response.split('\r\n\r\n')[1])
-        elif self._verbose:
-            sys.stdout.write(f'{self._request} \r\n{new_response.response}')
-        else:
-            if new_response.response:
-                sys.stdout.write(new_response.response)
+            return [self._request, response]
 
     def prepare_headers(self):
         if self._input_headers:
