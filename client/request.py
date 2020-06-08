@@ -31,7 +31,15 @@ class Request():
         self._response = bytearray()
         self._data = data
         try:
-            if self._request_type not in ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS", "CONNECT", "TRACE"]:
+            if self._request_type not in ["GET",
+                                          "POST",
+                                          "PUT",
+                                          "DELETE",
+                                          "PATCH",
+                                          "HEAD",
+                                          "OPTIONS",
+                                          "CONNECT",
+                                          "TRACE"]:
                 raise errors.IncorrectRequestType()
         except errors.IncorrectRequestType as e:
             print(e.message)

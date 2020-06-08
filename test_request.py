@@ -8,22 +8,33 @@ import main
 class TestHTTPClient(unittest.TestCase):
     parser = argparse.ArgumentParser(description='HTTP(S) - Client')
     parser.add_argument('-d', '--data', type=str, help='data for request')
-    parser.add_argument('-r', '--request', type=str, help='choose request method')
+    parser.add_argument('-r', '--request', type=str, help='choose request '
+                                                          'method')
     parser.add_argument('url', type=str, help='Contains URL')
     parser.add_argument('-e', '--reference', type=str, help='add previous URL')
-    parser.add_argument('-v', '--verbose', action='store_true', help='detailed response')
-    parser.add_argument('-f', '--file', type=str, help='send data from file')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='detailed response')
+    parser.add_argument('-f', '--file', type=str,
+                        help='send data from file')
     parser.add_argument('-c', '--cookie', type=str, help='add cookie')
-    parser.add_argument('-C', '--cookiefile', type=str, help='send cookie from file')
-    parser.add_argument('-A', '--agent', type=str, help='add your own User_Agent')
-    parser.add_argument('-O', '--output', type=str, help='print answer in file')
-    parser.add_argument('-H', '--headers', type=str, nargs="+", help='add headers in request', dest="my_headers")
-    parser.add_argument('-0', '--bodyignore', action='store_true', help='ignore body of response')
-    parser.add_argument('-1', '--headignore', action='store_true', help='ignore head of response')
-    parser.add_argument('-t', '--timeout', type=str, help='reset timeout')
+    parser.add_argument('-C', '--cookiefile', type=str,
+                        help='send cookie from file')
+    parser.add_argument('-A', '--agent', type=str, help='add your own '
+                                                        'User_Agent')
+    parser.add_argument('-O', '--output', type=str,
+                        help='print answer in file')
+    parser.add_argument('-H', '--headers', type=str, nargs="+",
+                        help='add headers in request', dest="my_headers")
+    parser.add_argument('-0', '--bodyignore', action='store_true',
+                        help='ignore body of response')
+    parser.add_argument('-1', '--headignore', action='store_true',
+                        help='ignore head of response')
+    parser.add_argument('-t', '--timeout', type=str, help='reset '
+                                                          'timeout')
 
     def test_check_get_request(self):
-        args = self.parser.parse_args(['http://ptsv2.com/t/lp5td-1586273836/post'])
+        args = self.parser.parse_args(['http://ptsv2.com'
+                                       '/t/lp5td-1586273836/post'])
         data = ''
         request = req.Request(args.url,
                               args.reference,
@@ -41,8 +52,9 @@ class TestHTTPClient(unittest.TestCase):
 
     def test_check_post_request_text(self):
         args = self.parser.parse_args(['-d', 'Hello, World!',
-                                            'http://ptsv2.com/t/lp5td-1586273836/post',
-                                            '-r', 'POST'])
+                                       'http://ptsv2.com/t/lp'
+                                       '5td-1586273836/post',
+                                       '-r', 'POST'])
         data = main.prepare_data(args)
         request = req.Request(args.url,
                               args.reference,
@@ -61,8 +73,10 @@ class TestHTTPClient(unittest.TestCase):
                          'Hello, World!', request.request)
 
     def test_check_get_request_with_reference(self):
-        args = self.parser.parse_args(['-e', 'http://ptsv2.com/t/lp5td-1586273836',
-                                            'http://ptsv2.com/t/lp5td-1586273836/post'])
+        args = self.parser.parse_args(['-e', 'http://ptsv2.com/t'
+                                             '/lp5td-1586273836',
+                                             'http://ptsv2.com/t/lp'
+                                             '5td-1586273836/post'])
         data = ''
         request = req.Request(args.url,
                               args.reference,
@@ -78,20 +92,24 @@ class TestHTTPClient(unittest.TestCase):
         self.assertEqual('GET /t/lp5td-1586273836/post HTTP/1.1\r\n'
                          'Host: ptsv2.com\r\n'
                          'Connection: close\r\n'
-                         'Reference: http://ptsv2.com/t/lp5td-1586273836\r\n\r\n', request.request)
+                         'Reference: http://ptsv2.com/t/'
+                         'lp5td-1586273836\r\n\r\n', request.request)
 
     def test_check_post_request_from_file(self):
         args = self.parser.parse_args(['-f', 'test_text.txt',
-                                            'http://ptsv2.com/t/lp5td-1586273836/post',
-                                            '-r', 'POST'])
+                                             'http://ptsv2.com/t'
+                                             '/lp5td-1586273836/post',
+                                             '-r', 'POST'])
         f = open('test_text.txt', 'w')
         f.write("Hello, my name is trail")
         f.close()
-        self.assertEqual('Hello, my name is trail', main.prepare_data(args))
+        self.assertEqual('Hello, my name is trail',
+                         main.prepare_data(args))
 
     def test_check_get_request_with_user_agent(self):
-        args = self.parser.parse_args(['http://ptsv2.com/t/lp5td-1586273836/post',
-                                            '-A', 'Mozilla/5.0'])
+        args = self.parser.parse_args(['http://ptsv2.com/t/lp5'
+                                       'td-1586273836/post',
+                                       '-A', 'Mozilla/5.0'])
         data = ''
         request = req.Request(args.url,
                               args.reference,
@@ -104,15 +122,18 @@ class TestHTTPClient(unittest.TestCase):
                               data)
         request.prepare_headers()
         request.make_request()
-        self.assertEqual('GET /t/lp5td-1586273836/post HTTP/1.1\r\n'
+        self.assertEqual('GET /t/lp5td-1586273836/post '
+                         'HTTP/1.1\r\n'
                          'Host: ptsv2.com\r\n'
                          'Connection: close\r\n'
-                         'User-Agent: Mozilla/5.0\r\n\r\n', request.request)
+                         'User-Agent: '
+                         'Mozilla/5.0\r\n\r\n', request.request)
 
     def test_check_get_request_with_cookie_and_user_agent(self):
-        args = self.parser.parse_args(['http://ptsv2.com/t/lp5td-1586273836/post',
-                                            '-A', 'Mozilla/5.0',
-                                            '-c', 'income=1'])
+        args = self.parser.parse_args(['http://ptsv2.com/t/'
+                                       'lp5td-1586273836/post',
+                                       '-A', 'Mozilla/5.0',
+                                       '-c', 'income=1'])
         data = ''
         request = req.Request(args.url,
                               args.reference,
@@ -138,7 +159,9 @@ class TestHTTPClient(unittest.TestCase):
                'Content-Type: text/html; charset=UTF-8\r\n\r\nHello'
         new_response = res.Response.prepare_fields(text.encode('utf-8'))
         self.assertEqual(' 200 ', new_response.code)
-        self.assertEqual({'Server': 'VK', 'Connection': 'close', 'Content-Type': 'text/html; charset=UTF-8'},
+        self.assertEqual({'Server': 'VK', 'Connection': 'close',
+                          'Content-Type': 'text/h'
+                                          'tml; charset=UTF-8'},
                          new_response.headers)
         self.assertEqual('UTF-8', new_response.charset)
         self.assertEqual('Hello', new_response.message)
