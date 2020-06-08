@@ -58,9 +58,11 @@ def show_response(request, response, args):
         sys.stdout.write(response.message)
     elif args.verbose:
         answer = [f'{request}']
+        answer.append(f'\r\n')
         answer.append(f'HTTP/{response.protocol} {response.code} OK')
         for header, value in response.headers.items():
             answer.append(f'{header}: {value}')
+        answer.append(f'\r\n')
         answer.append(response.message)
         sys.stdout.write('\r\n'.join(answer))
     elif args.output:
@@ -71,6 +73,7 @@ def show_response(request, response, args):
         answer = [f'HTTP/{response.protocol} {response.code} OK']
         for header, value in response.headers.items():
             answer.append(f'{header}: {value}')
+        answer.append(f'\r\n')
         answer.append(response.message)
         sys.stdout.write('\r\n'.join(answer))
 

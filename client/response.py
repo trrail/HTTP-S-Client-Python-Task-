@@ -11,7 +11,7 @@ class Response():
         self._protocol = float(protocol)
 
     @classmethod
-    def prepare_headers(cls, data):
+    def prepare_fields(cls, data):
         response = data.decode('ISO-8859-1')
         code = (re.search(r' [\d]* ', response)).group(0)
         protocol = (re.search(r'[\d\.\d]* ', response)).group(0)
