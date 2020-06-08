@@ -66,9 +66,6 @@ class Request():
         if new_response.content_length - 2048 > 0:
             data = self.__sock.recv(new_response.content_length - 2048)
             new_response.response = data
-        if new_response.chunk - 2048 > 0:
-            data = self.__sock.recv(new_response.chunk - 2048)
-            new_response.response = data
         self.__sock.close()
         if not new_response.location == '':
             request = Request(new_response.location,

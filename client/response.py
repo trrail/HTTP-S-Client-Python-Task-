@@ -10,7 +10,6 @@ class Response():
         self._location = ''
         self._headers = {}
         self._content_length = 0
-        self._chunks = 0
 
     def prepare_headers(self, data):
         self._response.extend(data)
@@ -28,11 +27,6 @@ class Response():
                         self._charset = f.group('charset')
                 if s.group('header') == 'Location' or s.group('header') == 'location':
                     self._location = s.group('value')
-                if s.group('header') == 'Transfer-Encoding' or s.group('header') == 'transfer-encoding':
-                    self._chunks = 1
-        if self._chunks == 1:
-            s = re.search(r'\r\n\r\n(?P<chunk>[\w\d]*)\r\n', response)
-            self._chunks = int(s.group('chunk'), 16)
 
     response = property()
     location = property()
@@ -60,7 +54,3 @@ class Response():
     @property
     def content_length(self):
         return self._content_length
-
-    @property
-    def chunk(self):
-        return self._chunks
