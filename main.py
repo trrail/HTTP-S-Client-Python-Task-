@@ -34,34 +34,47 @@ parser.add_argument('-t', '--timeout', type=str, help='reset timeout')
 def make_request():
     args = parser.parse_args()
     errors.check_for_exceptions(args)
+    data = prepare_data(args)
     request = req.Request(args.url,
                       args.reference,
-                      args.data,
-                      args.file,
                       args.cookie,
                       args.agent,
-                      args.output,
                       args.my_headers,
                       args.request,
                       args.cookiefile,
-                          args.timeout)
+                      args.timeout,
+                          data)
     answer = request.do_request()
-    show_response(answer[0], answer[1], args.bodyignore, args.headignore, args.verbose)
+    show_response(answer[0], answer[1], args)
 
 
-def show_response(request, response, body_ignore, head_ignore, verbose):
-    if body_ignore:
+def show_response(request, response, args):
+    if args.bodyignore:
         answer = [f'{response.response.decode(response.charset)[:15]}']
         for header, value in response.headers.items():
             answer.append(f'{header}: {value}')
         sys.stdout.write('\r\n'.join(answer))
-    elif head_ignore:
+    elif args.headignore:
         sys.stdout.write(response.message)
-    elif verbose:
+    elif args.verbose:
         sys.stdout.write(f'{request} \r\n{response.response.decode(response.charset)}')
+    elif args.output:
+        f = open(args.output, 'bw')
+        f.write(response.message.encode(response.charset))
+        f.close()
     else:
         sys.stdout.write(response.response.decode(response.charset))
 
+
+def prepare_data(args):
+    data = ''
+    if args.data:
+        data = args.data
+    if args.file:
+        f = open(args.file)
+        data = f.read()
+        f.close()
+    return data
 
 if __name__ == '__main__':
     make_request()

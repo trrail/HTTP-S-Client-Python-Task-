@@ -1,5 +1,4 @@
 import re
-from client import errors as er
 
 
 class Response():
@@ -16,7 +15,7 @@ class Response():
         response = data.decode('ISO-8859-1')
         self._code = (re.search(r' [\d]* ', response)).group(0)
         self._message = response.split('\r\n\r\n')[1]
-        for i in response.split('\r\n'):
+        for i in response.split('\r\n\r\n')[0].split('\r\n'):
             s = re.search(r'(?P<header>[a-zA-Z-]*): (?P<value>[0-9\s\w,.;=/:-]*)', i)
             if s is not None:
                 self._headers[s.group('header')] = s.group('value')

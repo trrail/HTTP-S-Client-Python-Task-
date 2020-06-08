@@ -9,24 +9,19 @@ import sys
 class Request():
     def __init__(self, url=None,
                  reference=None,
-                 data=None,
-                 file=None,
                  cookie=None,
                  agent=None,
-                 output=None,
                  headers=None,
                  request=None,
                  cookie_file=None,
-                 timeout=None):
+                 timeout=None,
+                 data=''):
         self._url = URL(url)
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self._data = data
         self._reference = reference
-        self._file = file
         self._protocol = "HTTP/1.1"
         self._cookie = cookie
         self._agent = agent
-        self._output = output
         self._cookie_from_file = cookie_file
         self._input_headers = headers
         self._headers = {}
@@ -34,6 +29,7 @@ class Request():
         self._request_type = request if request else "GET"
         self._request = ''
         self._response = bytearray()
+        self._data = data
         try:
             if self._request_type not in ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS", "CONNECT", "TRACE"]:
                 raise errors.IncorrectRequestType()
@@ -65,11 +61,8 @@ class Request():
         if not response.location == '':
             request = Request(response.location,
                               self._reference,
-                              self._data,
-                              self._file,
                               self._cookie,
                               self._agent,
-                              self._output,
                               self._headers,
                               self._request_type,
                               self._cookie_from_file,
@@ -96,25 +89,14 @@ class Request():
         if self._agent:
             self._headers["User-Agent"] = self._agent
 
-    def prepare_data(self):
-        data = ''
-        if self._data:
-            data = self._data
-        if self._file:
-            f = open(self._file, 'r')
-            data = f.read()
-            f.close()
-        return data
-
     def make_request(self):
         request = [f'{self._request_type} {self._url.path} {self._protocol}']
         request.append(f'Host: {self._url.host}')
         request.append(f'Connection: close')
         for header, value in self._headers.items():
             request.append(f'{header}: {value}')
-        body = self.prepare_data()
-        if len(body) != 0:
-            request.append(f'Content-Length: {len(body)}')
+        if len(self._data) != 0:
+            request.append(f'Content-Length: {len(self._data)}')
         request.append('')
-        request.append(f'{body}')
+        request.append(f'{self._data}')
         self._request = '\r\n'.join(request)
