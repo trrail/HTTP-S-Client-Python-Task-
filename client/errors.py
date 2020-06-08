@@ -4,6 +4,7 @@ import os
 class HTTPSClientException(Exception):
     pass
 
+
 class DataFromFileAndFromString(HTTPSClientException):
     message = 'Невозможно отправить данные из файла и из строки одновременно'
 

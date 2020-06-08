@@ -100,3 +100,7 @@ class Request():
         request.append('')
         request.append(f'{self._data}')
         self._request = '\r\n'.join(request)
+
+    @property
+    def request(self):
+        return self._request

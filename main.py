@@ -76,5 +76,6 @@ def prepare_data(args):
         f.close()
     return data
 
+
 if __name__ == '__main__':
     make_request()
