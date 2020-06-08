@@ -4,6 +4,7 @@ import unittest
 from client import response as res
 import main
 
+
 class TestHTTPClient(unittest.TestCase):
     parser = argparse.ArgumentParser(description='HTTP(S) - Client')
     parser.add_argument('-d', '--data', type=str, help='data for request')
@@ -135,7 +136,7 @@ class TestHTTPClient(unittest.TestCase):
                'Server: VK\r\n' \
                'Connection: close\r\n' \
                'Content-Type: text/html; charset=UTF-8\r\n\r\nHello'
-        new_response = res.Response(text.encode('utf-8'))
+        new_response = res.Response.prepare_fields(text.encode('utf-8'))
         self.assertEqual(' 200 ', new_response.code)
         self.assertEqual({'Server': 'VK', 'Connection': 'close', 'Content-Type': 'text/html; charset=UTF-8'},
                          new_response.headers)
