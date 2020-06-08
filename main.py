@@ -50,20 +50,29 @@ def make_request():
 
 def show_response(request, response, args):
     if args.bodyignore:
-        answer = [f'{response.response.decode(response.charset)[:15]}']
+        answer = [f'HTTP/{response.protocol} {response.code} OK']
         for header, value in response.headers.items():
             answer.append(f'{header}: {value}')
         sys.stdout.write('\r\n'.join(answer))
     elif args.headignore:
         sys.stdout.write(response.message)
     elif args.verbose:
-        sys.stdout.write(f'{request} \r\n{response.response.decode(response.charset)}')
+        answer = [f'{request}']
+        answer.append(f'HTTP/{response.protocol} {response.code} OK')
+        for header, value in response.headers.items():
+            answer.append(f'{header}: {value}')
+        answer.append(response.message)
+        sys.stdout.write('\r\n'.join(answer))
     elif args.output:
         f = open(args.output, 'bw')
         f.write(response.message.encode(response.charset))
         f.close()
     else:
-        sys.stdout.write(response.response.decode(response.charset))
+        answer = [f'HTTP/{response.protocol} {response.code} OK']
+        for header, value in response.headers.items():
+            answer.append(f'{header}: {value}')
+        answer.append(response.message)
+        sys.stdout.write('\r\n'.join(answer))
 
 
 def prepare_data(args):

@@ -57,7 +57,7 @@ class Request():
                 break
             self._response.extend(data)
         self.__sock.close()
-        response = res.Response(self._response)
+        response = res.Response.prepare_headers(self._response)
         if not response.location == '':
             request = Request(response.location,
                               self._reference,

@@ -2,37 +2,44 @@ import re
 
 
 class Response():
-    def __init__(self, response=None):
-        self._response = response
-        self._charset = "utf-8"
-        self._code = ''
-        self._message = ''
-        self._location = ''
-        self._headers = {}
-        self.prepare_headers(response)
+    def __init__(self, message, charset, code, location, protocol, headers):
+        self._charset = charset
+        self._code = int(code)
+        self._message = message
+        self._location = location
+        self._headers = headers
+        self._protocol = float(protocol)
 
-    def prepare_headers(self, data):
+    @classmethod
+    def prepare_headers(cls, data):
         response = data.decode('ISO-8859-1')
-        self._code = (re.search(r' [\d]* ', response)).group(0)
-        self._message = response.split('\r\n\r\n')[1]
+        code = (re.search(r' [\d]* ', response)).group(0)
+        protocol = (re.search(r'[\d\.\d]* ', response)).group(0)
+        message = response.split('\r\n\r\n')[1]
+        charset = ''
+        headers = {}
+        location = ''
         for i in response.split('\r\n\r\n')[0].split('\r\n'):
             s = re.search(r'(?P<header>[a-zA-Z-]*): (?P<value>[0-9\s\w,.;=/:-]*)', i)
             if s is not None:
-                self._headers[s.group('header')] = s.group('value')
+                headers[s.group('header')] = s.group('value')
                 if s.group('header') == 'Content-Type' or s.group('header') == 'content-type':
                     f = re.search(r'[a-zA-z/]*; charset=(?P<charset>[\w\d-]*)', s.group('value'))
                     if f is not None:
-                        self._charset = f.group('charset')
+                        charset = f.group('charset')
+                    else:
+                        charset = 'utf-8'
                 if s.group('header') == 'Location' or s.group('header') == 'location':
-                    self._location = s.group('value')
-
-    @property
-    def response(self):
-        return self._response
+                    location = s.group('value')
+        return cls(message, charset, code, location, protocol, headers)
 
     @property
     def message(self):
         return self._message
+
+    @property
+    def protocol(self):
+        return self._protocol
 
     @property
     def headers(self):
