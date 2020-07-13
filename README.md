@@ -29,5 +29,5 @@
 |    -t    |            Set timeout              | -t 3000                                                          |
 
 ## Developer
-  Was created by Meshcheryakov G. known as trrail
+  Was created by Meshcheryakov G.
 
