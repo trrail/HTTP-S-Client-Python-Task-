@@ -3,6 +3,7 @@ import argparse
 import unittest
 from client import response as res
 import main
+from client import errors
 
 
 class TestHTTPClient(unittest.TestCase):
@@ -72,29 +73,6 @@ class TestHTTPClient(unittest.TestCase):
                          'Content-Length: 13\r\n\r\n'
                          'Hello, World!', request.request)
 
-    def test_check_get_request_with_reference(self):
-        args = self.parser.parse_args(['-e', 'http://ptsv2.com/t'
-                                             '/lp5td-1586273836',
-                                             'http://ptsv2.com/t/lp'
-                                             '5td-1586273836/post'])
-        data = ''
-        request = req.Request(args.url,
-                              args.reference,
-                              args.cookie,
-                              args.agent,
-                              args.my_headers,
-                              args.request,
-                              args.cookiefile,
-                              args.timeout,
-                              data)
-        request.prepare_headers()
-        request.make_request()
-        self.assertEqual('GET /t/lp5td-1586273836/post HTTP/1.1\r\n'
-                         'Host: ptsv2.com\r\n'
-                         'Connection: close\r\n'
-                         'Reference: http://ptsv2.com/t/'
-                         'lp5td-1586273836\r\n\r\n', request.request)
-
     def test_check_post_request_from_file(self):
         args = self.parser.parse_args(['-f', 'test_text.txt',
                                              'http://ptsv2.com/t'
@@ -106,65 +84,62 @@ class TestHTTPClient(unittest.TestCase):
         self.assertEqual('Hello, my name is trail',
                          main.prepare_data(args))
 
-    def test_check_get_request_with_user_agent(self):
-        args = self.parser.parse_args(['http://ptsv2.com/t/lp5'
-                                       'td-1586273836/post',
-                                       '-A', 'Mozilla/5.0'])
-        data = ''
-        request = req.Request(args.url,
-                              args.reference,
-                              args.cookie,
-                              args.agent,
-                              args.my_headers,
-                              args.request,
-                              args.cookiefile,
-                              args.timeout,
-                              data)
-        request.prepare_headers()
-        request.make_request()
-        self.assertEqual('GET /t/lp5td-1586273836/post '
-                         'HTTP/1.1\r\n'
-                         'Host: ptsv2.com\r\n'
-                         'Connection: close\r\n'
-                         'User-Agent: '
-                         'Mozilla/5.0\r\n\r\n', request.request)
-
-    def test_check_get_request_with_cookie_and_user_agent(self):
-        args = self.parser.parse_args(['http://ptsv2.com/t/'
-                                       'lp5td-1586273836/post',
-                                       '-A', 'Mozilla/5.0',
-                                       '-c', 'income=1'])
-        data = ''
-        request = req.Request(args.url,
-                              args.reference,
-                              args.cookie,
-                              args.agent,
-                              args.my_headers,
-                              args.request,
-                              args.cookiefile,
-                              args.timeout,
-                              data)
-        request.prepare_headers()
-        request.make_request()
-        self.assertEqual('GET /t/lp5td-1586273836/post HTTP/1.1\r\n'
-                         'Host: ptsv2.com\r\n'
-                         'Connection: close\r\n'
-                         'Cookie: income=1\r\n'
-                         'User-Agent: Mozilla/5.0\r\n\r\n', request.request)
-
     def test_response(self):
         text = 'HTTP/1.1 200 Ok\r\n' \
                'Server: VK\r\n' \
                'Connection: close\r\n' \
                'Content-Type: text/html; charset=UTF-8\r\n\r\nHello'
         new_response = res.Response.prepare_fields(text.encode('utf-8'))
-        self.assertEqual(' 200 ', new_response.code)
+        self.assertEqual(200, new_response.code)
         self.assertEqual({'Server': 'VK', 'Connection': 'close',
                           'Content-Type': 'text/h'
                                           'tml; charset=UTF-8'},
                          new_response.headers)
         self.assertEqual('UTF-8', new_response.charset)
         self.assertEqual('Hello', new_response.message)
+
+    def test_prepare_headers(self):
+        args = self.parser.parse_args(['http://ptsv2.com/t/lp5'
+                                       'td-1586273836/post',
+                                       '-H', 'Content-Length: 30', 'Pory: tau',
+                                       '-e', 'https://vk.com/',
+                                       '-c', 'income=1',
+                                       '-C', 'cookie.txt',
+                                       '-A', 'Chrome'])
+        f = open('cookie.txt', 'w')
+        f.write('hello')
+        f.close()
+        data = ''
+        request = req.Request(args.url,
+                              args.reference,
+                              args.cookie,
+                              args.agent,
+                              args.my_headers,
+                              args.request,
+                              args.cookiefile,
+                              args.timeout,
+                              data)
+        request.prepare_headers()
+        self.assertEqual({'Content-Length': '30',
+                          'Pory': 'tau', 'Reference': 'https://vk.com/',
+                          'Cookie': 'hello', 'User-Agent': 'Chrome'},
+                         request.headers)
+
+    def test_request(self):
+        args = self.parser.parse_args(['http://ptsv2.com'
+                                       '/t/lp5td-1586273836/post'])
+        request = req.Request(args.url,
+                              args.reference,
+                              args.cookie,
+                              args.agent,
+                              args.my_headers,
+                              args.request,
+                              args.cookiefile,
+                              args.timeout,
+                              '')
+        data = request.do_request()
+        self.assertNotEqual(None, data[0])
+        self.assertNotEqual(None, data[1])
 
 
 if __name__ == '__main__':

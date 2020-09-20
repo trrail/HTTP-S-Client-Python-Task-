@@ -3,7 +3,6 @@ import ssl
 from client import response as res
 from client import errors
 from yarl import URL
-import sys
 
 
 class Request():
@@ -112,3 +111,7 @@ class Request():
     @property
     def request(self):
         return self._request
+
+    @property
+    def headers(self):
+        return self._headers
