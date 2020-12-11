@@ -3,7 +3,6 @@ import argparse
 import unittest
 from client import response as res
 import main
-from client import errors
 
 
 class TestHTTPClient(unittest.TestCase):

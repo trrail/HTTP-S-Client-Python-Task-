@@ -97,9 +97,9 @@ class Request():
             self._headers["User-Agent"] = self._agent
 
     def make_request(self):
-        request = [f'{self._request_type} {self._url.path} {self._protocol}']
-        request.append(f'Host: {self._url.host}')
-        request.append(f'Connection: close')
+        request = [f'{self._request_type} {self._url.path} {self._protocol}',
+                   f'Host: {self._url.host}',
+                   f'Connection: close']
         for header, value in self._headers.items():
             request.append(f'{header}: {value}')
         if len(self._data) != 0:
