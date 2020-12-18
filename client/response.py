@@ -1,7 +1,7 @@
 import re
 
 
-class Response():
+class Response:
     def __init__(self, message, charset, code, location, protocol, headers):
         self._charset = charset
         self._code = int(code)
@@ -12,30 +12,34 @@ class Response():
 
     @classmethod
     def prepare_fields(cls, data):
-        response = data.decode('ISO-8859-1')
-        code = (re.search(r' [\d]* ', response)).group(0)
-        protocol = (re.search(r'[\d\.\d]* ', response)).group(0)
-        message = response.split('\r\n\r\n')[1]
-        charset = ''
+        response = data.decode("ISO-8859-1")
+        code = (re.search(r" [\d]* ", response)).group(0)
+        protocol = (re.search(r"[\d\.\d]* ", response)).group(0)
+        message = response.split("\r\n\r\n")[1]
+        charset = ""
         headers = {}
-        location = ''
-        for i in response.split('\r\n\r\n')[0].split('\r\n'):
-            s = re.search(r'(?P<header>[a-zA-Z-]*): '
-                          r'(?P<value>[0-9\s\w,.;=/:-]*)', i)
+        location = ""
+        for i in response.split("\r\n\r\n")[0].split("\r\n"):
+            s = re.search(
+                r"(?P<header>[a-zA-Z-]*): " r"(?P<value>[0-9\s\w,.;=/:-]*)", i
+            )
             if s is not None:
-                headers[s.group('header')] = s.group('value')
-                if s.group('header') == 'Content-Type' \
-                        or s.group('header') == 'content-type':
-                    f = re.search(r'[a-zA-z/]*; '
-                                  r'charset=(?P<charset>'
-                                  r'[\w\d-]*)', s.group('value'))
+                headers[s.group("header")] = s.group("value")
+                if (
+                    s.group("header") == "Content-Type"
+                    or s.group("header") == "content-type"
+                ):
+                    f = re.search(
+                        r"[a-zA-z/]*; " r"charset=(?P<charset>" r"[\w\d-]*)",
+                        s.group("value"),
+                    )
                     if f is not None:
-                        charset = f.group('charset')
+                        charset = f.group("charset")
                     else:
-                        charset = 'utf-8'
-                if s.group('header') == 'Location' \
-                        or s.group('header') == 'location':
-                    location = s.group('value')
+                        charset = "utf-8"
+                if s.group("header") == "Location" \
+                        or s.group("header") == "location":
+                    location = s.group("value")
         return cls(message, charset, code, location, protocol, headers)
 
     @property

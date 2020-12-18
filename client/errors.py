@@ -6,15 +6,15 @@ class HTTPSClientException(Exception):
 
 
 class DataFromFileAndFromString(HTTPSClientException):
-    message = 'Невозможно отправить данные из файла и из строки одновременно'
+    message = "Невозможно отправить данные из файла и из строки одновременно"
 
 
 class UnreadableFile(HTTPSClientException):
-    message = 'Файл не существует или поверждён'
+    message = "Файл не существует или поверждён"
 
 
 class VerboseException(HTTPSClientException):
-    message = 'Ключ -v нельзя совмещать с ключами -1 и -0'
+    message = "Ключ -v нельзя совмещать с ключами -1 и -0"
 
 
 class ConnectionError(HTTPSClientException):
