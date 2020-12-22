@@ -3,13 +3,12 @@ from client import errors
 from yarl import URL
 
 
-def prepare_url(
-    url: str = None, scheme: str = "https", host: str = None, path: str = ""
-) -> URL:
-    return (
-        URL(url) if url is not None
-        else URL("{0}://{1}{2}".format(scheme, host, path))
-    )
+def prepare_url(url: str = None,
+                scheme: str = "https",
+                host: str = None,
+                path: str = "") -> URL:
+    return (URL(url) if url is not None
+            else URL("{0}://{1}{2}".format(scheme, host, path)))
 
 
 def make_request(req_type: str, url: URL, headers: dict, data: str) -> str:
@@ -53,18 +52,15 @@ class Request:
 
     @classmethod
     def prepare_request(
-        cls,
-        headers: dict,
-        data: str,
-        request_type: str,
-        url: str = None,
-        scheme: str = None,
-        host: str = None,
-        path: str = None,
-    ):
+            cls,
+            headers: dict,
+            request_type: str,
+            data: str = '',
+            url: str = None,
+            scheme: str = None,
+            host: str = None,
+            path: str = None):
         scheme = scheme if url is None else URL(url).scheme
         url = prepare_url(url, scheme, host, path)
-        return cls(
-            make_request(identify_request_type(request_type),
-                         url, headers, data), url
-        )
+        return cls(make_request(identify_request_type(request_type),
+                                url, headers, data), url)

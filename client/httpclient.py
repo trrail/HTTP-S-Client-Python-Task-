@@ -16,7 +16,7 @@ class HttpClient:
             sock = ssl.wrap_socket(sock)
         try:
             sock.connect((self.request.url.host, self.request.url.port))
-        except Exception:
+        except errors.HTTPSClientException:
             print(errors.ConnectionError.message)
             exit(1)
         sock.settimeout(self.timeout)
