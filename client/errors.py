@@ -21,7 +21,7 @@ class ConnectionError(HTTPSClientException):
     message = "Не смог подсоединиться к серверу. Проверьте URL-ссылку"
 
 
-class IncorrectRequestType(HTTPSClientException):
+class IncorrectMethodType(HTTPSClientException):
     message = "Введённый тип запроса не существует. Посмотрите help"
 
 

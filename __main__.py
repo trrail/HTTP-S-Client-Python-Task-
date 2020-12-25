@@ -1,30 +1,27 @@
+from yarl import URL
+
 from client.request import Request
 from client.httpclient import HttpClient
-from client.response import Response
 import argparse
-from client import errors
 import sys
-from client import prepare
 
-MAX = 10
+MAX: int = 10
 
 parser = argparse.ArgumentParser(description="HTTP(S) - Client")
 parser.add_argument("-d", "--data", type=str, help="data for request")
-parser.add_argument(
-    "-r",
-    "--request",
-    type=str,
-    help="choose request method:"
-    "GET|"
-    "POST|"
-    "PUT|"
-    "CONNECT|"
-    "PATCH|"
-    "OPTIONS|"
-    "DELETE|"
-    "HEAD|"
-    "TRACE",
-)
+parser.add_argument("-m", "--method",
+                    type=str,
+                    help="choose request method:"
+                         "GET|"
+                         "POST|"
+                         "PUT|"
+                         "CONNECT|"
+                         "PATCH|"
+                         "OPTIONS|"
+                         "DELETE|"
+                         "HEAD|"
+                         "TRACE",
+                    )
 parser.add_argument("-u", "--url", type=str, help="Contains URL")
 parser.add_argument("-e", "--reference", type=str, help="add previous URL")
 parser.add_argument("-v", "--verbose", action="store_true",
@@ -64,30 +61,48 @@ parser.add_argument(
 
 def make_request():
     args = parser.parse_args()
-    errors.check_for_exceptions(args)
-    data = prepare.prepare_data(args)
-    location = None
-    for i in range(MAX):
-        headers = prepare.prepare_headers(args, location)
-        request = Request.prepare_request(
-            headers=headers,
-            request_type=args.request,
-            data=data,
-            url=args.url if location is None else location,
-            scheme=args.scheme if args.scheme is not None else "http",
-            host=args.host,
-            path=args.path if args.path is not None else "",
-        )
-        http_client = HttpClient(request,
-                                 int(args.timeout) if args.timeout
-                                 else 1000)
-        http_client.do_request()
-        response = Response.prepare_fields(http_client.response)
-        if response.code // 100 == 3:
-            location = response.location
-        else:
-            show_response(request.request, response, args)
-            break
+    request = prepare_request(args)
+    response = HttpClient().do_request(request, 1000, MAX)
+    show_response(request, response, args)
+
+
+def prepare_request(args) -> Request:
+    if args.url is not None:
+        request = Request(url=URL(args.url))
+    elif args.host is not None:
+        request = Request()
+        request.set_host(args.host)
+    else:
+        raise AttributeError
+    if args.method:
+        request.set_method(args.method)
+    if args.path:
+        request.set_path(args.path)
+    if args.scheme:
+        request.set_scheme(args.scheme)
+    if args.my_headers:
+        headers = {}
+        for header in args.my_headers:
+            separator_ind = header.find(":")
+            key = header[0:separator_ind]
+            value = header[separator_ind + 1::].strip()
+            headers[key] = value
+        request.set_headers(headers)
+    if args.reference:
+        request.set_header('Reference', args.reference)
+    if args.cookie:
+        request.set_header('Cookie', args.cookie)
+    if args.cookiefile:
+        with open(args.cookiefile, "r") as file:
+            request.set_header('Cookie', file.read())
+    if args.agent:
+        request.set_header('User-Agent', args.agent)
+    if args.data:
+        request.set_body(args.data)
+    if args.file:
+        with open(args.file, 'r') as file:
+            request.set_body(file.read())
+    return request
 
 
 def show_response(request, response, args):
@@ -97,25 +112,24 @@ def show_response(request, response, args):
             answer.append(f"{header}: {value}")
         sys.stdout.write("\r\n".join(answer))
     elif args.headignore:
-        sys.stdout.write(response.message)
+        sys.stdout.write(response.body)
     elif args.verbose:
-        answer = [f"{request}", "\r\n",
+        answer = [f"{bytes(request).decode()}", "\r\n",
                   f"HTTP/{response.protocol} {response.code} OK"]
         for header, value in response.headers.items():
             answer.append(f"{header}: {value}")
         answer.append("\r\n")
-        answer.append(response.message)
+        answer.append(response.body)
         sys.stdout.write("\r\n".join(answer))
     elif args.output:
-        f = open(args.output, "bw")
-        f.write(response.message.encode(response.charset))
-        f.close()
+        with open(args.output, 'bw') as file:
+            file.write(response.body.encode(response.charset))
     else:
         answer = [f"HTTP/{response.protocol} {response.code} OK"]
         for header, value in response.headers.items():
             answer.append(f"{header}: {value}")
         answer.append("\r\n")
-        answer.append(response.message)
+        answer.append(response.body)
         sys.stdout.write("\r\n".join(answer))
 
 

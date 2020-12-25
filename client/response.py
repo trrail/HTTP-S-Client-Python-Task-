@@ -1,21 +1,22 @@
 import re
+from dataclasses import dataclass, field
 
 
+@dataclass
 class Response:
-    def __init__(self, message, charset, code, location, protocol, headers):
-        self._charset = charset
-        self._code = int(code)
-        self._message = message
-        self._location = location
-        self._headers = headers
-        self._protocol = float(protocol)
+    body: str = ''
+    charset: str = 'utf-8'
+    code: int = -1
+    location: str = None
+    headers: dict[str, str] = field(default_factory=dict)
+    protocol: float = 1.0
 
     @classmethod
-    def prepare_fields(cls, data):
+    def parse(cls, data: bytes):
         response = data.decode("ISO-8859-1")
         code = (re.search(r" [\d]* ", response)).group(0)
         protocol = (re.search(r"[\d\.\d]* ", response)).group(0)
-        message = response.split("\r\n\r\n")[1]
+        body = response.split("\r\n\r\n")[1]
         charset = ""
         headers = {}
         location = ""
@@ -40,28 +41,6 @@ class Response:
                 if s.group("header") == "Location" \
                         or s.group("header") == "location":
                     location = s.group("value")
-        return cls(message, charset, code, location, protocol, headers)
-
-    @property
-    def message(self):
-        return self._message
-
-    @property
-    def protocol(self):
-        return self._protocol
-
-    @property
-    def headers(self):
-        return self._headers
-
-    @property
-    def code(self):
-        return self._code
-
-    @property
-    def charset(self):
-        return self._charset
-
-    @property
-    def location(self):
-        return self._location
+        return cls(body=body, charset=charset,
+                   code=int(code), location=location,
+                   protocol=float(protocol), headers=headers)
