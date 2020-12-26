@@ -39,7 +39,6 @@ class Request:
 
     def __post_init__(self):
         self.headers["Host"] = URL(self.url).host
-        self.path = URL(self.url).path
         if "Connection" not in self.headers:
             self.headers["Connection"] = "close"
         if "Content-Length" not in self.headers:

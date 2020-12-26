@@ -1,24 +1,38 @@
-from client.response import Response
-from client.request import Request
-from client.httpclient import HttpClient
 import pytest
+from client.response import Response
 
 
-@pytest.fixture()
-def data() -> bytearray:
-    request = Request.prepare_request(headers={'Host': 'vk.com',
-                                               'Connection': 'close'},
-                                      data='hello',
-                                      request_type='post',
-                                      url='https://vk.com/feed')
-    http_client = HttpClient(request, 1000)
-    http_client.do_request()
-    return http_client.response
+@pytest.fixture
+def data():
+    return 'HTTP/1.1 400 OK\r\n' \
+           'Server: kittenx\r\n' \
+           'Date: Sat, 26 Dec 2020 11:48:21 GMT\r\n' \
+           'Content_Type: text/html\r\n' \
+           'Content-Length: 152\r\n' \
+           'Connection: close\r\n' \
+           'X-Frontend: front213218\r\n' \
+           'Location: blablacar.com\r\n' \
+           'Access-Control-Expose-Headers: X-Frontend\r\n' \
+           '\r\n' \
+           '<html>\r\n' \
+           '<head><title>400 Bad Request</title></head>\r\n' \
+           '<body>\r\n' \
+           '<center><h1>400 Bad Request</h1></center>\r\n' \
+           '<hr><center>kittenx</center>\r\n' \
+           '</body>\r\n' \
+           '</html\r\n>'.encode()
 
 
-def test_prepare_response_fields(data):
-    response = Response.prepare_fields(data)
-    assert response.code == 302
-    assert response.location == 'https://login.vk.com/'
-    assert response.charset == 'windows-1251'
+def test_response_parse(data):
+    response = Response().parse(data)
+    assert response.body == '<html>\r\n' \
+           '<head><title>400 Bad Request</title></head>\r\n' \
+           '<body>\r\n' \
+           '<center><h1>400 Bad Request</h1></center>\r\n' \
+           '<hr><center>kittenx</center>\r\n' \
+           '</body>\r\n' \
+           '</html\r\n>'
+    assert response.code == 400
+    assert response.location == 'blablacar.com'
     assert response.protocol == 1.1
+    assert response.charset == "utf-8"

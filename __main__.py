@@ -1,5 +1,4 @@
-from yarl import URL
-
+from client.errors import check_for_exceptions
 from client.request import Request
 from client.httpclient import HttpClient
 import argparse
@@ -61,16 +60,17 @@ parser.add_argument(
 
 def make_request():
     args = parser.parse_args()
+    check_for_exceptions(args)
     request = prepare_request(args)
-    response = HttpClient().do_request(request, 1000, MAX)
+    response = HttpClient().do_request(request, 1000, 10)
     show_response(request, response, args)
 
 
 def prepare_request(args) -> Request:
+    request = Request()
     if args.url is not None:
-        request = Request(url=URL(args.url))
+        request.set_url(args.url)
     elif args.host is not None:
-        request = Request()
         request.set_host(args.host)
     else:
         raise AttributeError

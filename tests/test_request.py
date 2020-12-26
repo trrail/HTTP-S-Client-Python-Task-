@@ -1,38 +1,53 @@
-from client import request
-from yarl import URL
+from client.request import Request
 
 
-def test_make_request():
-    prepared_request = request.make_request("POST",
-                                            URL('https://vk.com/feed'),
-                                            {'Host': 'vk.com',
-                                             'Connection': 'close'},
-                                            'hello, World')
-    expected_request = 'POST /feed HTTP/1.1\r\n' \
-                       'Host: vk.com\r\n' \
-                       'Connection: close\r\n' \
-                       'Content-Length: 12\r\n\r\n' \
-                       'hello, World'
-    assert expected_request == prepared_request
+def test_request():
+    request = Request()
+    expected_bytes_request: str = 'GET / HTTP/1.1\r\n' \
+                                  'Host: None\r\n' \
+                                  'Connection: close\r\n' \
+                                  'Content-Length: 0\r\n\r\n'
+    assert bytes(request).decode() == expected_bytes_request
 
 
-def test_identify_request_type():
-    req_type = request.identify_request_type('delete')
-    assert req_type == 'DELETE'
+def test_set_method_with_url():
+    request = Request()
+    request.set_url('https://vk.com/feed')
+    request.set_body('Hello')
+    request.set_headers({'Cookie': '1234',
+                         'Reference': 'blablacar.com'})
+    request.set_header(header='User-Agent', value='Yandex')
+    request.set_method('post')
+    expected_bytes_request: str = 'POST /feed HTTP/1.1\r\n' \
+                                  'Host: vk.com\r\n' \
+                                  'Connection: close\r\n' \
+                                  'Content-Length: 5\r\n' \
+                                  'Cookie: 1234\r\n' \
+                                  'Reference: blablacar.com\r\n' \
+                                  'User-Agent: Yandex\r\n\r\n' \
+                                  'Hello'
+    assert bytes(request).decode() == expected_bytes_request
 
 
-def test_prepare_url():
-    assert URL('https://vk.com') == request.prepare_url(url='https://vk.com')
-    assert URL('https://vk.com') == request.prepare_url(scheme='https',
-                                                        host='vk.com',
-                                                        path='')
-
-
-def test_prepare_request():
-    req = request.Request.prepare_request(headers={'Host': 'vk.com',
-                                                   'Connection': 'close'},
-                                          data='hello',
-                                          request_type='get',
-                                          url='https://vk.com/feed')
-    assert req.url == URL('https://vk.com/feed')
-    assert len(req.request) > 0
+def test_methods_with_host():
+    request = Request()
+    request.set_host('vk.com')
+    request.set_path('/feed/ru')
+    request.set_scheme('http')
+    request.set_body('Hello')
+    request.set_headers({'Cookie': '1234',
+                         'Reference': 'blablacar.com'})
+    request.set_header(header='User-Agent', value='Yandex')
+    request.set_method('delete')
+    request.set_protocol('HTTP/1.0')
+    expected_bytes_request: str = 'DELETE /feed/ru HTTP/1.0\r\n' \
+                                  'Host: vk.com\r\n' \
+                                  'Connection: close\r\n' \
+                                  'Content-Length: 5\r\n' \
+                                  'Cookie: 1234\r\n' \
+                                  'Reference: blablacar.com\r\n' \
+                                  'User-Agent: Yandex\r\n\r\n' \
+                                  'Hello'
+    assert bytes(request).decode() == expected_bytes_request
+    assert request.scheme == 'http'
+    assert request.host == 'vk.com'

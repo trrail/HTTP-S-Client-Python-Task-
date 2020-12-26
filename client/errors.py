@@ -17,8 +17,12 @@ class VerboseException(HTTPSClientException):
     message = "Ключ -v нельзя совмещать с ключами -1 и -0"
 
 
-class ConnectionError(HTTPSClientException):
+class ConnectError(HTTPSClientException):
     message = "Не смог подсоединиться к серверу. Проверьте URL-ссылку"
+
+
+class MaxDirectionsError(HTTPSClientException):
+    message = "Закончились попытки на переадресацию"
 
 
 class IncorrectMethodType(HTTPSClientException):
