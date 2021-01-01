@@ -1,5 +1,5 @@
 .coverage
 .idea
 .pytest_cache
-__pycache__
+client/__pycache__/*
 */__pycache__
