@@ -11,16 +11,22 @@ class Response:
     headers: dict[str, str] = field(default_factory=dict)
     protocol: float = 1.0
 
+    def __bytes__(self):
+        response = [f"HTTP/{self.protocol} {self.code} OK"]
+        for header, value in self.headers.items():
+            response.append(f"{header}: {value}")
+        return '\r\b'.join(response).encode()
+
     @classmethod
     def parse(cls, data: bytes):
         response = data.decode("ISO-8859-1")
         code = (re.search(r" [\d]* ", response)).group(0)
         protocol = (re.search(r"[\d\.\d]* ", response)).group(0)
-        body = response.split("\r\n\r\n")[1]
+        head, body = response.split("\r\n\r\n")
         charset = "utf-8"
         headers = {}
         location = ""
-        for i in response.split("\r\n\r\n")[0].split("\r\n"):
+        for i in head.split("\r\n"):
             search_headers = re.search(r"(?P<header>[a-zA-Z-]*): "
                                        r"" r"(?P<value>[0-9\s\w,.;=/:-]*)", i)
             if search_headers is not None:

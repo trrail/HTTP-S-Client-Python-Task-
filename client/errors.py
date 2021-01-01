@@ -1,6 +1,3 @@
-import os
-
-
 class HTTPSClientException(Exception):
     pass
 
@@ -27,32 +24,3 @@ class MaxDirectionsError(HTTPSClientException):
 
 class IncorrectMethodType(HTTPSClientException):
     message = "Введённый тип запроса не существует. Посмотрите help"
-
-
-def check_for_exceptions(args):
-    try:
-        if args.verbose and (args.bodyignore or args.headignore):
-            raise VerboseException
-        if args.file and args.data:
-            raise DataFromFileAndFromString
-    except DataFromFileAndFromString as e:
-        print(e.message)
-        exit(1)
-    except VerboseException as e:
-        print(e.message)
-        exit(1)
-
-    if args.file:
-        try:
-            if not (os.path.exists(args.file)):
-                raise HTTPSClientException
-        except HTTPSClientException:
-            print(UnreadableFile.message)
-            exit(1)
-    if args.cookiefile:
-        try:
-            if not os.path.exists(args.file):
-                raise HTTPSClientException
-        except HTTPSClientException:
-            print(UnreadableFile.message)
-            exit(1)
